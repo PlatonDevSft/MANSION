@@ -1,9 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   House,
+  Search,
+  BookOpen,
+  BrainCircuit,
+  ChartCandlestick,
+  Copy,
+  Crown,
   Users,
   Newspaper,
   MessageSquare,
@@ -20,7 +26,11 @@ import {
 import { useLocal } from "@/lib/use-local";
 const links = [
   ["/", "Главная", House],
+  ["/trading", "Журнал", ChartCandlestick],
+  ["/ai", "AI Ассистент", BrainCircuit],
   ["/community", "Сообщество", Users],
+  ["/copy-trading", "Копи-трейдинг", Copy],
+  ["/knowledge", "База знаний", BookOpen],
   ["/news", "Новости", Newspaper],
   ["/requests", "Запросы", MessageSquare],
   ["/leaderboard", "Рейтинг", ChartNoAxesColumn],
@@ -34,12 +44,26 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const [support, setSupport] = useState(false);
   const [profile, setProfile] = useState(false);
   const [sent, setSent] = useState(false);
+  const [search, setSearch] = useState("");
+  const searchInput = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const shortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        searchInput.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", shortcut);
+    return () => window.removeEventListener("keydown", shortcut);
+  }, []);
   const requests = useLocal<{ id: string; message: string; status: string }[]>(
     "mansion.requests",
     [],
   );
   return (
-    <div className="app">
+    <div
+      className={"app " + (path === "/" ? "dashboard-scene" : "inner-scene")}
+    >
       <button
         className="mobile-menu icon-button"
         aria-label="Открыть навигацию"
@@ -49,7 +73,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </button>
       <aside className={menu ? "sidebar mobile-open" : "sidebar"}>
         <Link href="/" className="logo" onClick={() => setMenu(false)}>
-          Mansion<span>TRADING INTELLIGENCE</span>
+          <span className="brand-mark" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+          </span>
+          <span className="brand-name">MANSION</span>
         </Link>
         <nav aria-label="Главная навигация">
           {links.map(([href, label, Icon]) => (
@@ -69,7 +100,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="sidebar-bottom">
           <div className="member-mark">
-            <Diamond size={18} />
+            <Crown size={18} />
             <div>
               Mansion Member<small>Демонстрационный доступ</small>
             </div>
@@ -82,7 +113,37 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </aside>
       <div className="workspace">
         <header className="topbar">
-          <span className="edition">ВАШЕ ЛИЧНОЕ ПРЕИМУЩЕСТВО</span>
+          <div className="global-search">
+            <Search size={17} />
+            <input
+              ref={searchInput}
+              aria-label="Поиск по разделам"
+              placeholder="Поиск по сделкам, трейдерам, стратегиям…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setSearch("");
+              }}
+            />
+            <kbd>⌘ K</kbd>
+            {search.trim() && (
+              <div className="search-results">
+                {links
+                  .filter(([, label]) =>
+                    label.toLowerCase().includes(search.toLowerCase()),
+                  )
+                  .map(([href, label, Icon]) => (
+                    <Link key={href} href={href} onClick={() => setSearch("")}>
+                      <Icon size={16} />
+                      {label}
+                    </Link>
+                  ))}
+                {!links.some(([, label]) =>
+                  label.toLowerCase().includes(search.toLowerCase()),
+                ) && <p>Раздел не найден. Попробуйте «Журнал».</p>}
+              </div>
+            )}
+          </div>
           <div className="profile-wrap">
             <span className="demo-pill">DEMO · локальные данные</span>
             <button

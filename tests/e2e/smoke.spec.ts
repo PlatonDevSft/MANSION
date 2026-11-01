@@ -3,7 +3,7 @@ test("dashboard and journal persist a trade", async ({ page }) => {
   await page.goto("/");
   await expect(
     page.getByRole("heading", {
-      name: "Торгуйте осознанно. Растите системно.",
+      name: "Дисциплина сегодня — результат завтра",
     }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Следующий раздел" }).click();
@@ -34,3 +34,19 @@ for (const width of [375, 768, 1024, 1440, 1920])
       ),
     ).toBe(true);
   });
+
+test("carousel keyboard and section search", async ({ page }) => {
+  await page.goto("/");
+  const carousel = page.getByRole("region", { name: "Разделы Mansion" });
+  await carousel.focus();
+  await carousel.press("ArrowRight");
+  await expect(
+    page.getByRole("button", { name: "Показать Community" }),
+  ).toHaveAttribute("aria-current", "true");
+  await page.getByLabel("Поиск по разделам").fill("Журнал");
+  await page
+    .locator(".search-results")
+    .getByRole("link", { name: "Журнал" })
+    .click();
+  await expect(page).toHaveURL(/\/trading$/);
+});

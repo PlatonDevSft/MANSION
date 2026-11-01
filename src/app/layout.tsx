@@ -6,6 +6,7 @@ import "@fontsource/manrope/cyrillic-500.css";
 import "@fontsource/cormorant-garamond/latin-400.css";
 import "@fontsource/cormorant-garamond/cyrillic-400.css";
 import "./globals.css";
+import "./redesign.css";
 import { Shell } from "@/components/shell";
 export const metadata: Metadata = {
   title: "Mansion — Trading Intelligence",

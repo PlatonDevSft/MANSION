@@ -6,6 +6,10 @@
 - Never mix currencies or apply the linear P&L formula to unsupported instruments. Money inputs are decimal strings; calculations use Decimal.js; PostgreSQL uses numeric.
 - Supabase client credentials must be anon/publishable only. Authorize server actions with getUser(); keep RLS on all tables. No service-role key in browser code.
 - Keep private notes/trades separate from public posts. Do not expose trade screenshots publicly.
-- Feature illustrations are intentional CSS/SVG fallback compositions, not temporary stock photos. No WebGL necessary.
+- Hero and feature illustrations are generated 3D artwork, optimized as WebP in public/images. Preserve their proportions; no WebGL is necessary.
 - Run lint, typecheck, unit tests, build and relevant browser tests. Record external checks that remain unverified.
 - AI/news/calendar/billing are extension points, not working integrations. Never fake success.
+
+## Delivery preference
+
+The user requests that completed, validated changes be committed and pushed to GitHub main immediately, so the connected Vercel site can update. Fetch first and preserve remote changes; do not force-push. This does not authorize publishing cloud-environment drafts.

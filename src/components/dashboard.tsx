@@ -8,60 +8,26 @@ import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
-  Layers,
+  BrainCircuit,
   ChartCandlestick,
   Users,
 } from "lucide-react";
-import { modules, traders, demoTrades } from "@/lib/demo";
+import { modules as allModules, traders, demoTrades } from "@/lib/demo";
 import { money, statistics } from "@/lib/journal";
 import { useLocal } from "@/lib/use-local";
 export function Sculpture({ kind }: { kind: string }) {
-  return (
-    <div aria-hidden="true" className={`sculpture ${kind}`}>
-      {kind === "trading" ? (
-        <>
-          <div className="glass-panel back" />
-          <div className="glass-panel">
-            <div className="candles">
-              {[30, 55, 42, 78, 62, 95, 74, 115, 96, 132].map((v, i) => (
-                <i
-                  key={i}
-                  style={{
-                    height: v / 2,
-                    marginBottom: i * 5,
-                    background: i % 3 === 1 ? "#648e7e" : "#a5d1be",
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="plinth" />
-        </>
-      ) : kind === "archive" ? (
-        <>
-          {[0, 1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="slab"
-              style={{
-                transform: `translateY(${i * 18}px) rotateX(58deg) rotateZ(-32deg)`,
-              }}
-            />
-          ))}
-          <div className="plinth" />
-        </>
-      ) : (
-        <>
-          <div className="orb one" />
-          <div className="orb two" />
-          <div className="orb three" />
-          <div className="orbit" />
-          <div className="plinth" />
-        </>
-      )}
-    </div>
-  );
+  return <div aria-hidden="true" className={`sculpture render-art ${kind}`} />;
 }
+const modules = [3, 1, 2, 5, 0, 4, 6].map((i) => allModules[i]);
+const names: Record<string, string> = {
+  ai: "AI Ассистент",
+  trading: "Журнал сделок",
+  community: "Сообщество",
+  "copy-trading": "Копи-трейдинг",
+  knowledge: "База знаний",
+  strategies: "Strategy Lab",
+  economy: "Экономика",
+};
 export function Dashboard() {
   const local = useLocal("mansion.trades", demoTrades);
   const stats = statistics(local.value);
@@ -86,40 +52,32 @@ export function Dashboard() {
   return (
     <>
       <section className="welcome">
-        <div className="eyebrow">
-          <span /> THE MANSION EXPERIENCE
-        </div>
+        <div className="eyebrow">MANSION / TRADING INTELLIGENCE</div>
         <h1>
-          Торгуйте осознанно.
+          Дисциплина
           <br />
-          <em>Растите системно.</em>
+          сегодня —<br />
+          <em>результат завтра</em>
         </h1>
-        <p>Ваши сделки, знания и окружение. В одном пространстве.</p>
-      </section>
-      <section className="stats" aria-label="Торговые результаты">
-        {[
-          ["Последняя закрытая сделка", stats.last, "Реализованный P&L · USD"],
-          ["Результат за месяц", stats.monthly, "Календарный месяц · UTC"],
-          ["Средний результат", stats.average, "Все закрытые сделки · USD"],
-        ].map(([label, value, caption]) => (
-          <div className="stat" key={String(label)}>
-            <div className="stat-label">
-              {String(label)}
-              <ArrowUpRight size={15} />
-            </div>
-            <strong
-              className={value !== null && Number(value) < 0 ? "negative" : ""}
-            >
-              {money(value as Parameters<typeof money>[0])}
-            </strong>
-            <small>{String(caption)}</small>
-          </div>
-        ))}
+        <p>
+          Все инструменты для осознанной торговли
+          <br />в одном пространстве.
+        </p>
+        <span className="hero-line" />
+        <div className="hero-principles" aria-hidden="true">
+          ANALYZE
+          <br />
+          IMPROVE
+          <br />
+          DISCIPLINE
+          <br />
+          GROW
+          <span />
+        </div>
       </section>
       <section className="explore">
         <div className="section-title">
           <div>
-            <span className="eyebrow">СОЗДАЙТЕ СВОЮ СИСТЕМУ</span>
             <h2>Ваше пространство</h2>
           </div>
           <span className="counter">
@@ -157,8 +115,9 @@ export function Dashboard() {
                 <div className="feature-slide" key={m.slug}>
                   <motion.div
                     animate={{
-                      opacity: selected === i ? 1 : 0.66,
-                      scale: selected === i ? 1 : 0.94,
+                      opacity: selected === i ? 1 : 0.72,
+                      scale: selected === i ? 1 : 0.91,
+                      rotateY: selected === i ? 0 : i < selected ? -7 : 7,
                     }}
                     transition={{ duration: reduced ? 0 : 0.4 }}
                     className={
@@ -168,21 +127,20 @@ export function Dashboard() {
                     <Link href={"/" + m.slug}>
                       <div className="feature-top">
                         {i === 0 ? (
-                          <Layers size={18} />
+                          <BrainCircuit size={20} />
                         ) : i === 1 ? (
                           <ChartCandlestick size={18} />
                         ) : (
                           <Users size={18} />
                         )}
-                        <span>{m.number} / MANSION</span>
+                        <span>0{i + 1}</span>
                       </div>
-                      <Sculpture kind={m.art} />
+                      <Sculpture kind={m.slug === "ai" ? "ai" : m.art} />
                       <div className="feature-copy">
-                        <span className="eyebrow">{m.label}</span>
-                        <h3>{m.title}</h3>
+                        <h3>{names[m.slug]}</h3>
                         <p>{m.text}</p>
                         <span className="round-arrow">
-                          <ArrowUpRight size={18} />
+                          <ArrowRight size={18} />
                         </span>
                       </div>
                     </Link>
@@ -210,6 +168,26 @@ export function Dashboard() {
             />
           ))}
         </div>
+      </section>
+      <section className="stats" aria-label="Торговые результаты">
+        {[
+          ["Последняя закрытая сделка", stats.last, "Реализованный P&L · USD"],
+          ["Результат за месяц", stats.monthly, "Календарный месяц · UTC"],
+          ["Средний результат", stats.average, "Все закрытые сделки · USD"],
+        ].map(([label, value, caption]) => (
+          <div className="stat" key={String(label)}>
+            <div className="stat-label">
+              {String(label)}
+              <ArrowUpRight size={15} />
+            </div>
+            <strong
+              className={value !== null && Number(value) < 0 ? "negative" : ""}
+            >
+              {money(value as Parameters<typeof money>[0])}
+            </strong>
+            <small>{String(caption)}</small>
+          </div>
+        ))}
       </section>
       <section className="best">
         <div className="section-title">

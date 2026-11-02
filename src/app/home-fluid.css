@@ -28,7 +28,7 @@
   inset: 0;
   height: auto;
   max-height: none;
-  background-image: url("/images/obsidian-hero.webp");
+  background-image: url("/images/home-background.webp");
   background-size: auto min(105svh, 1500px);
   background-position: right top;
   background-repeat: no-repeat;

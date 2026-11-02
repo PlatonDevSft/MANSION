@@ -269,3 +269,42 @@
     transition: none !important;
   }
 }
+
+/* Reserve profile control space and align settings like every other row. */
+@media (min-width: 601px) {
+  .dashboard-scene .sidebar nav a.settings-link,
+  .dashboard-scene.home-compact .sidebar nav a.settings-link {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .dashboard-scene .home-user-trigger {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) 16px;
+    gap: 8px;
+  }
+  .dashboard-scene .home-user-trigger .home-user-copy {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .dashboard-scene .home-user-copy strong,
+  .dashboard-scene .home-user-copy small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dashboard-scene .home-user-chevron {
+    display: block;
+    width: 16px;
+    height: 16px;
+  }
+  .dashboard-scene.home-compact .home-user-trigger {
+    display: flex;
+  }
+}
+/* Side cards move inward, leaving room for hover growth inside the viewport. */
+@media (min-width: 601px) and (min-height: 850px) {
+  .dashboard-scene .carousel-viewport {
+    padding-top: 16px;
+    padding-bottom: 20px;
+  }
+}

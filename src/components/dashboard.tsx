@@ -140,6 +140,7 @@ export function Dashboard() {
                     <GlowCard
                       animate={{
                         opacity: 1,
+                        x: `${Math.max(-1, Math.min(1, offsets[i])) * -6}%`,
                         scale: reduced
                           ? selected === i
                             ? 1

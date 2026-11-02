@@ -461,3 +461,35 @@ test("home rail keeps icon positions throughout collapse and excludes secondary 
     }
   }
 });
+
+for (const width of [1440, 1920, 3440]) {
+  test(`home hover stays inside carousel and rail controls align at ${width}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: width === 3440 ? 1440 : 1080 });
+    await page.goto("/");
+    const settings = page.locator(".sidebar .settings-link");
+    const icon = (await settings.locator("svg").boundingBox())!;
+    const label = (await settings.locator(".nav-label").boundingBox())!;
+    expect(
+      Math.abs(icon.y + icon.height / 2 - label.y - label.height / 2),
+    ).toBeLessThan(1.5);
+    const trigger = (await page.locator(".home-user-trigger").boundingBox())!;
+    const chevron = (await page.locator(".home-user-chevron").boundingBox())!;
+    expect(chevron.x).toBeGreaterThan(trigger.x);
+    expect(chevron.x + chevron.width).toBeLessThanOrEqual(
+      trigger.x + trigger.width,
+    );
+    for (const i of [1, 3]) {
+      const card = page.locator(".feature-card").nth(i);
+      await card.hover();
+      await page.waitForTimeout(350);
+      const r = (await card.boundingBox())!;
+      const viewport = (await page.locator(".carousel-viewport").boundingBox())!;
+      expect(r.x).toBeGreaterThanOrEqual(viewport.x);
+      expect(r.x + r.width).toBeLessThanOrEqual(viewport.x + viewport.width);
+      expect(r.y).toBeGreaterThanOrEqual(viewport.y);
+      expect(r.y + r.height).toBeLessThanOrEqual(viewport.y + viewport.height);
+    }
+  });
+}

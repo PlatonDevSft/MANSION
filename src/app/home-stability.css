@@ -138,3 +138,21 @@
     transition: none;
   }
 }
+
+.dashboard-scene .home-ambient {
+  position: fixed;
+  inset: auto;
+  left: 0;
+  top: 0;
+  min-height: 0;
+  width: 100vw;
+  height: 100vh;
+}
+.dashboard-scene main {
+  padding-top: clamp(40px, 4.5svh, 66px);
+}
+@media (max-width: 600px) {
+  .dashboard-scene main {
+    padding-top: 86px;
+  }
+}

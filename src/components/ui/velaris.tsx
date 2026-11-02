@@ -33,6 +33,13 @@ export default function Velaris() {
   useEffect(() => {
     const el = canvas.current;
     if (!el) return;
+    const screenWidth = window.screen.width || window.innerWidth;
+    const screenHeight = window.screen.height || window.innerHeight;
+    const layer = el.parentElement;
+    if (layer) {
+      layer.style.width = `${screenWidth}px`;
+      layer.style.height = `${screenHeight}px`;
+    }
     const motion = matchMedia("(prefers-reduced-motion: reduce)");
     const gl = el.getContext("webgl", {
       alpha: true,
@@ -103,8 +110,7 @@ export default function Velaris() {
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
     const resize = () => {
-      const r = el.getBoundingClientRect();
-      aspectValue = r.width / Math.max(1, r.height);
+      aspectValue = screenWidth / Math.max(1, screenHeight);
       // Only update projection and redraw synchronously; keep the last gradient visible throughout.
       if (!motion.matches && visible && !document.hidden) paint();
     };

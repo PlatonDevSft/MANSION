@@ -46,6 +46,25 @@ export function Dashboard() {
   const [selected, setSelected] = useState(2);
   const [visibleSlides, setVisibleSlides] = useState<number[]>([1, 2, 3]);
   const reduced = useReducedMotion();
+  const [offsets, setOffsets] = useState([-2, -1, 0, 1, 2]);
+  useEffect(() => {
+    if (!api) return;
+    const sync = () =>
+      setOffsets(
+        api.scrollSnapList().map((snap) => {
+          let distance = snap - api.scrollProgress();
+          distance = ((((distance + 0.5) % 1) + 1) % 1) - 0.5;
+          return distance * modules.length;
+        }),
+      );
+    sync();
+    api.on("scroll", sync);
+    api.on("reInit", sync);
+    return () => {
+      api.off("scroll", sync);
+      api.off("reInit", sync);
+    };
+  }, [api]);
   const select = useCallback(() => {
     if (api) {
       setSelected(api.selectedScrollSnap());
@@ -121,8 +140,17 @@ export function Dashboard() {
                     <GlowCard
                       animate={{
                         opacity: 1,
-                        scale: selected === i ? 1 : 0.91,
-                        rotateY: selected === i ? 0 : i < selected ? -7 : 7,
+                        scale: reduced
+                          ? selected === i
+                            ? 1
+                            : 0.91
+                          : 1 - Math.min(Math.abs(offsets[i]), 2) * 0.09,
+                        rotateY: reduced
+                          ? 0
+                          : Math.max(-1, Math.min(1, offsets[i])) * -18,
+                        z: reduced
+                          ? 0
+                          : -Math.min(Math.abs(offsets[i]), 2) * 55,
                       }}
                       whileHover={
                         reduced
@@ -130,7 +158,7 @@ export function Dashboard() {
                           : { scale: selected === i ? 1.025 : 0.95 }
                       }
                       transition={{
-                        duration: reduced ? 0 : 0.3,
+                        duration: reduced ? 0 : 0.22,
                         ease: [0.22, 0.61, 0.36, 1],
                       }}
                       className={

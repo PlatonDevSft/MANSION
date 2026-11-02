@@ -46,6 +46,41 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const [sent, setSent] = useState(false);
   const [search, setSearch] = useState("");
   const searchInput = useRef<HTMLInputElement>(null);
+  const navigation = useRef<HTMLElement>(null);
+  const menuTrigger = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!menu) return;
+    const trigger = menuTrigger.current;
+    const before = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    navigation.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    const keyboard = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMenu(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const elements = Array.from(
+        navigation.current?.querySelectorAll<HTMLElement>("a,button") ?? [],
+      );
+      const first = elements[0],
+        last = elements.at(-1);
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener("keydown", keyboard);
+    return () => {
+      document.body.style.overflow = before;
+      document.removeEventListener("keydown", keyboard);
+      trigger?.focus();
+    };
+  }, [menu]);
+
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
@@ -64,14 +99,44 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div
       className={"app " + (path === "/" ? "dashboard-scene" : "inner-scene")}
     >
+      <a className="skip-link" href="#main-content">
+        Перейти к содержимому
+      </a>
       <button
+        ref={menuTrigger}
+        aria-expanded={menu}
+        aria-controls="primary-navigation"
         className="mobile-menu icon-button"
         aria-label="Открыть навигацию"
         onClick={() => setMenu(!menu)}
       >
         {menu ? <X /> : <Menu />}
       </button>
-      <aside className={menu ? "sidebar mobile-open" : "sidebar"}>
+      {menu && (
+        <button
+          className="navigation-scrim"
+          aria-label="Закрыть навигацию"
+          onClick={() => setMenu(false)}
+          tabIndex={-1}
+        />
+      )}
+      <aside
+        ref={navigation}
+        id="primary-navigation"
+        role={menu ? "dialog" : undefined}
+        aria-modal={menu ? true : undefined}
+        aria-label="Навигация Mansion"
+        className={menu ? "sidebar mobile-open" : "sidebar"}
+      >
+        {menu && (
+          <button
+            className="navigation-close icon-button"
+            aria-label="Закрыть меню"
+            onClick={() => setMenu(false)}
+          >
+            <X size={20} />
+          </button>
+        )}
         <Link href="/" className="logo" onClick={() => setMenu(false)}>
           <span className="brand-mark" aria-hidden="true">
             <i />
@@ -87,6 +152,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <Link
               key={href}
               href={href}
+              aria-current={path === href ? "page" : undefined}
               onClick={() => setMenu(false)}
               className={
                 (path === href ? "active " : "") +
@@ -111,23 +177,52 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <p>Осознанность. Дисциплина. Рост.</p>
         </div>
       </aside>
-      <div className="workspace">
+      <div className="workspace" inert={menu}>
         <header className="topbar">
           <div className="global-search">
             <Search size={17} />
             <input
               ref={searchInput}
               aria-label="Поиск по разделам"
-              placeholder="Поиск по сделкам, трейдерам, стратегиям…"
+              placeholder="Поиск по разделам Mansion…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Escape") setSearch("");
+                if (e.key === "ArrowDown" && search.trim()) {
+                  e.preventDefault();
+                  document
+                    .querySelector<HTMLAnchorElement>(".search-results a")
+                    ?.focus();
+                }
               }}
             />
             <kbd>⌘ K</kbd>
             {search.trim() && (
-              <div className="search-results">
+              <div
+                className="search-results"
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    setSearch("");
+                    searchInput.current?.focus();
+                  }
+                  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    e.preventDefault();
+                    const items = Array.from(
+                      e.currentTarget.querySelectorAll<HTMLAnchorElement>("a"),
+                    );
+                    const current = items.indexOf(
+                      document.activeElement as HTMLAnchorElement,
+                    );
+                    items[
+                      (current +
+                        (e.key === "ArrowDown" ? 1 : -1) +
+                        items.length) %
+                        items.length
+                    ]?.focus();
+                  }
+                }}
+              >
                 {links
                   .filter(([, label]) =>
                     label.toLowerCase().includes(search.toLowerCase()),
@@ -167,7 +262,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
             )}
           </div>
         </header>
-        <main id="main-content">{children}</main>
+        <main id="main-content" tabIndex={-1}>
+          {children}
+        </main>
         <footer>
           MANSION <span>Пространство осознанной торговли</span>
           <span>Демо · не инвестиционная рекомендация</span>

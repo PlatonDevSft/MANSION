@@ -1,0 +1,741 @@
+/* UI UX Pro Max audit, adapted to the user's Mansion material direction. */
+:root {
+  --text-primary: #edf3ef;
+  --text-secondary: #b3c4ba;
+  --text-muted: #a0b5a8;
+  --surface-solid: #0b1511;
+  --border-interactive: #6c8e7e;
+  --focus-ring: #97e5c7;
+  --motion-fast: 180ms;
+  --radius-card: 18px;
+}
+body {
+  font-size: 16px;
+  color: var(--text-primary);
+}
+button,
+a {
+  touch-action: manipulation;
+}
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+.skip-link {
+  position: fixed;
+  left: 20px;
+  top: 12px;
+  transform: translateY(-180%);
+  z-index: 100;
+  background: #d2eddf;
+  color: #082014;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.skip-link:focus {
+  transform: none;
+}
+main:focus {
+  outline: none;
+}
+.sidebar {
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.sidebar nav {
+  gap: 4px;
+  margin-top: 34px;
+}
+.sidebar nav a {
+  font-size: 13px;
+  min-height: 42px;
+  color: var(--text-secondary);
+  transition:
+    color var(--motion-fast),
+    background var(--motion-fast);
+}
+.sidebar nav a.active {
+  color: #a0e8cd;
+}
+.sidebar nav a:hover {
+  background: #b4e2c00a;
+  color: var(--text-primary);
+}
+.sidebar-bottom {
+  padding-top: 28px;
+}
+.member-mark {
+  font-size: 12px;
+}
+.member-mark small {
+  font-size: 11px;
+}
+.sidebar-bottom > a {
+  font-size: 11px;
+  line-height: 1.7;
+}
+.sidebar-bottom > p {
+  font-size: 10px;
+  line-height: 1.7;
+}
+.topbar {
+  gap: 24px;
+}
+.global-search {
+  height: 44px;
+  width: min(520px, 53%);
+  border-color: #adcabb20;
+}
+.global-search input {
+  font-size: 13px;
+}
+.global-search input::placeholder {
+  color: var(--text-muted);
+}
+.global-search kbd {
+  font-size: 11px;
+}
+.profile {
+  min-height: 44px;
+  font-size: 12px;
+}
+.demo-pill {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+.profile-menu {
+  border: 1px solid #93b9a333;
+  border-radius: 10px;
+  box-shadow: 0 16px 50px #0008;
+}
+.profile-menu a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  border-radius: 6px;
+}
+.profile-menu a:hover {
+  background: #ffffff08;
+}
+.search-results a {
+  min-height: 44px;
+  font-size: 14px;
+}
+.search-results p {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.welcome {
+  min-height: 330px;
+  padding-top: 32px;
+}
+.welcome .eyebrow {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+}
+.welcome h1 {
+  letter-spacing: -2.4px;
+  text-wrap: balance;
+}
+.welcome > p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.hero-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 44px;
+  font-size: 13px;
+  color: #b0e7ce;
+  border-bottom: 1px solid #71aa8e50;
+  margin-top: -5px;
+  transition:
+    color var(--motion-fast),
+    border-color var(--motion-fast);
+}
+.hero-action:hover {
+  color: #e0faec;
+  border-color: #b0e7ce;
+}
+.hero-principles {
+  color: var(--text-muted);
+  font-size: 10px;
+  right: 2%;
+}
+.dashboard-scene .workspace:before {
+  background-image:
+    linear-gradient(0deg, #040909, transparent 38%),
+    linear-gradient(90deg, #04090955, transparent 60%),
+    url("/images/obsidian-hero.webp");
+}
+.feature-slide {
+  flex-basis: 33.333%;
+}
+.feature-card {
+  height: 430px;
+  border-radius: var(--radius-card);
+  background: linear-gradient(145deg, #192920e8, #08120ff2 65%);
+  border-color: #b4d0be38;
+}
+.feature-card.selected {
+  background:
+    radial-gradient(ellipse at 0 0, #91d6af25, transparent 45%),
+    linear-gradient(135deg, #182e23f2, #0b1912f5 75%);
+  border-color: #a4d6ba99;
+}
+.feature-card > a {
+  padding: 24px;
+}
+.feature-top span {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.feature-top > svg {
+  width: 40px;
+  height: 44px;
+  color: #c7dfd0;
+  border-color: #789d863d;
+}
+.feature-copy {
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+}
+.feature-copy h3 {
+  font-size: 21px;
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+  margin: 8px 0 12px;
+  text-wrap: balance;
+}
+.feature-copy p {
+  font-size: 14px;
+  line-height: 1.65;
+  max-width: 270px;
+  min-height: 48px;
+  color: var(--text-secondary);
+}
+.feature-status {
+  font-size: 10px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: #b6d1c0;
+}
+.round-arrow {
+  height: 40px;
+  width: 40px;
+  margin-top: 18px;
+  border-color: #789d8666;
+  color: #c1e2cf;
+}
+.feature-card a:hover .round-arrow {
+  background: #264938;
+  border-color: #b1e1c8;
+}
+.render-art.sculpture {
+  width: 190px;
+  height: 175px;
+  margin-top: -10px;
+  mask-image: radial-gradient(
+    ellipse 66% 75% at 50% 38%,
+    #000 48%,
+    transparent 92%
+  );
+}
+.carousel-arrow {
+  width: 44px;
+  height: 44px;
+  border-color: var(--border-interactive);
+}
+.carousel-arrow:hover {
+  background: #1b3025;
+}
+.carousel-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 7px 8px 0;
+}
+.carousel-announcement {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  font-size: 12px;
+  color: #d8e9dd;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.carousel-announcement > span {
+  color: var(--text-muted);
+}
+.carousel-announcement .current-section {
+  border-left: 1px solid #ffffff20;
+  padding-left: 14px;
+  margin-left: 5px;
+}
+.carousel-bottom .dots {
+  margin: 0;
+  gap: 4px;
+}
+.dots button,
+.dots button.current {
+  width: 28px;
+  height: 32px;
+  position: relative;
+  background: none;
+  box-shadow: none;
+}
+.dots button:before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 15px;
+  height: 2px;
+  background: #668b76;
+}
+.dots button.current:before {
+  background: #8ae2bd;
+  box-shadow: 0 0 8px #64d8b133;
+}
+.dots button:after {
+  inset: 0;
+}
+.stats {
+  margin-top: 30px;
+}
+.stat {
+  padding: 22px 24px;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.stat strong {
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+}
+.stat small {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+.best .section-title h2 {
+  font-size: 32px;
+}
+.best .section-title p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.text-link {
+  font-size: 13px;
+  min-height: 32px;
+}
+.trader {
+  padding: 20px 16px;
+  gap: 12px;
+  border-color: #9fb9a525;
+  transition:
+    background var(--motion-fast),
+    border-color var(--motion-fast);
+}
+.trader:hover {
+  background: #16271d;
+  border-color: #9fb9a560;
+}
+.trader strong {
+  font-size: 13px;
+}
+.trader small {
+  font-size: 11px;
+  line-height: 1.6;
+}
+.trader-result {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.trader svg {
+  width: 40px;
+}
+.trader-avatar {
+  width: 38px;
+  height: 38px;
+}
+.support-button {
+  width: 44px;
+  height: 44px;
+}
+.support-panel p {
+  font-size: 14px;
+}
+.support-panel label {
+  font-size: 13px;
+}
+.button {
+  min-height: 44px;
+  font-size: 14px;
+}
+.icon-button {
+  min-width: 36px;
+  min-height: 36px;
+}
+footer {
+  font-size: 11px;
+  letter-spacing: 0.7px;
+  line-height: 1.8;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+.inner-scene .panel p,
+.inner-scene label {
+  font-size: 14px;
+}
+.inner-scene .page-heading p {
+  font-size: 15px;
+}
+.info-banner {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.tabs button {
+  min-height: 44px;
+  font-size: 14px;
+}
+.panel small {
+  font-size: 12px;
+}
+td {
+  font-size: 13px;
+}
+th {
+  font-size: 12px;
+}
+.navigation-scrim {
+  display: none;
+}
+@media (min-width: 1600px) {
+  .welcome {
+    min-height: 365px;
+  }
+  .feature-card {
+    height: 460px;
+  }
+  .render-art.sculpture {
+    width: 220px;
+    height: 205px;
+  }
+  .feature-copy h3 {
+    font-size: 23px;
+  }
+  .feature-copy p {
+    font-size: 15px;
+  }
+  .welcome > p {
+    font-size: 15px;
+  }
+}
+@media (min-width: 601px) and (max-width: 1100px) {
+  .feature-slide {
+    flex-basis: 50%;
+  }
+  .feature-card {
+    height: 435px;
+  }
+  .hero-principles {
+    display: none;
+  }
+  .profile > span:not(.avatar) {
+    display: none;
+  }
+  .topbar .global-search {
+    width: 75%;
+  }
+  .trader svg {
+    display: none;
+  }
+  .welcome h1 {
+    font-size: 44px;
+  }
+  .welcome > p {
+    font-size: 13px;
+  }
+  .sidebar nav a {
+    font-size: 12px;
+    padding-left: 9px;
+    gap: 10px;
+  }
+  .sidebar-bottom > a {
+    font-size: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .topbar {
+    margin-left: 67px;
+    margin-right: 18px;
+    gap: 12px;
+  }
+  .global-search {
+    height: 44px;
+    width: auto;
+    padding: 0 11px;
+  }
+  .global-search input {
+    font-size: 16px;
+  }
+  .global-search input::placeholder {
+    font-size: 12px;
+  }
+  .profile-wrap {
+    flex-shrink: 0;
+  }
+  .mobile-menu {
+    width: 44px;
+    height: 44px;
+    top: 13px;
+    left: 12px;
+  }
+  .sidebar.mobile-open {
+    top: 0;
+    bottom: 0;
+    z-index: 70;
+    width: min(300px, 85vw);
+    padding: 32px 24px calc(24px + env(safe-area-inset-bottom));
+    box-shadow: 20px 0 80px #0008;
+  }
+  .sidebar.mobile-open nav a {
+    min-height: 44px;
+    font-size: 14px;
+    padding: 11px 14px;
+  }
+  .sidebar.mobile-open .brand-name {
+    font-size: 14px;
+  }
+  .navigation-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    background: #000a;
+    backdrop-filter: blur(5px);
+  }
+  .sidebar-bottom > a {
+    font-size: 12px;
+  }
+  .sidebar-bottom > p {
+    font-size: 11px;
+  }
+  .welcome {
+    min-height: 375px;
+    padding-top: 32px;
+  }
+  .welcome .eyebrow {
+    font-size: 9px;
+    letter-spacing: 2px;
+  }
+  .welcome h1 {
+    font-size: 39px;
+    line-height: 1.12;
+    letter-spacing: -1.9px;
+  }
+  .welcome > p {
+    font-size: 13px;
+    max-width: 285px;
+  }
+  .hero-action {
+    font-size: 13px;
+    margin-top: 0;
+  }
+  .dashboard-scene .workspace:before {
+    opacity: 0.55;
+    background-image:
+      linear-gradient(0deg, #040909, transparent 50%),
+      linear-gradient(90deg, #040909a6, #04090920),
+      url("/images/obsidian-hero.webp");
+  }
+  .feature-slide {
+    flex-basis: 92%;
+  }
+  .feature-card {
+    height: 435px;
+  }
+  .feature-card > a {
+    padding: 24px;
+  }
+  .feature-copy {
+    left: 24px;
+    right: 24px;
+    bottom: 24px;
+  }
+  .feature-copy h3 {
+    font-size: 21px;
+  }
+  .feature-copy p {
+    font-size: 14px;
+    min-height: 48px;
+  }
+  .render-art.sculpture {
+    width: 195px;
+    height: 180px;
+  }
+  .round-arrow {
+    height: 44px;
+    width: 44px;
+  }
+  .carousel-arrow {
+    width: 44px;
+    height: 44px;
+  }
+  .carousel-arrow.prev {
+    left: -16px;
+  }
+  .carousel-arrow.next {
+    right: -16px;
+  }
+  .carousel-bottom {
+    padding: 10px 0 0;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .carousel-announcement {
+    width: 100%;
+    justify-content: center;
+    font-size: 12px;
+  }
+  .carousel-bottom .dots {
+    margin: 0;
+  }
+  .dots button,
+  .dots button.current {
+    height: 44px;
+    width: 32px;
+  }
+  .dots button:before {
+    top: 21px;
+  }
+  .stat-label,
+  .stats .stat-label {
+    font-size: 12px;
+  }
+  .stats .stat small {
+    font-size: 11px;
+    line-height: 1.6;
+    max-width: 165px;
+  }
+  .stats .stat {
+    padding: 20px 16px;
+    gap: 5px;
+  }
+  .stats .stat strong {
+    font-size: 25px;
+  }
+  .best .section-title {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .best .section-title h2 {
+    font-size: 30px;
+  }
+  .best .section-title p {
+    font-size: 12px;
+    line-height: 1.7;
+    max-width: 270px;
+  }
+  .best .text-link {
+    font-size: 12px;
+    min-height: 44px;
+  }
+  .trader strong {
+    font-size: 13px;
+  }
+  .trader small {
+    font-size: 11px;
+  }
+  .trader-result {
+    font-size: 18px;
+  }
+  .trader {
+    padding: 18px 14px;
+    gap: 10px;
+  }
+  .trader svg {
+    display: none;
+  }
+  .support-button {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    right: 16px;
+  }
+  .support-panel {
+    bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+  input,
+  textarea,
+  select,
+  .toolbar select {
+    font-size: 16px;
+  }
+  .inner-scene .page-heading h1 {
+    font-size: 32px;
+  }
+  .inner-scene .page-heading p {
+    font-size: 14px;
+  }
+  footer {
+    font-size: 11px;
+    gap: 10px;
+    padding-bottom: 88px;
+  }
+  .sidebar.mobile-open .member-mark {
+    font-size: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feature-card,
+  .trader,
+  .hero-action {
+    transition: none;
+  }
+  .carousel-track {
+    scroll-behavior: auto;
+  }
+}
+.navigation-close {
+  display: none;
+}
+@media (max-width: 600px) {
+  .navigation-close {
+    display: flex;
+    position: absolute;
+    right: 10px;
+    top: 11px;
+    width: 44px;
+    height: 44px;
+  }
+}
+/* Explicit layer sizes keep the original rock composition intact. */
+.dashboard-scene .workspace:before {
+  background-size:
+    cover,
+    cover,
+    100% auto;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+@media (max-width: 600px) {
+  .dashboard-scene .workspace:before {
+    background-size:
+      cover,
+      cover,
+      auto 450px;
+    background-position:
+      center top,
+      center top,
+      61% 0;
+  }
+}

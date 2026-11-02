@@ -11,6 +11,10 @@ import {
   BrainCircuit,
   ChartCandlestick,
   Users,
+  BookOpen,
+  Copy,
+  FlaskConical,
+  Globe,
 } from "lucide-react";
 import { modules as allModules, traders, demoTrades } from "@/lib/demo";
 import { money, statistics } from "@/lib/journal";
@@ -28,6 +32,15 @@ const names: Record<string, string> = {
   strategies: "Strategy Lab",
   economy: "Экономика",
 };
+const featureIcons = {
+  ai: BrainCircuit,
+  trading: ChartCandlestick,
+  community: Users,
+  knowledge: BookOpen,
+  "copy-trading": Copy,
+  strategies: FlaskConical,
+  economy: Globe,
+};
 export function Dashboard() {
   const local = useLocal("mansion.trades", demoTrades);
   const stats = statistics(local.value);
@@ -37,16 +50,22 @@ export function Dashboard() {
     startIndex: 1,
   });
   const [selected, setSelected] = useState(1);
+  const [visibleSlides, setVisibleSlides] = useState<number[]>([0, 1, 2]);
   const reduced = useReducedMotion();
   const select = useCallback(() => {
-    if (api) setSelected(api.selectedScrollSnap());
+    if (api) {
+      setSelected(api.selectedScrollSnap());
+      setVisibleSlides(api.slidesInView());
+    }
   }, [api]);
   useEffect(() => {
     if (!api) return;
     select();
     api.on("select", select);
+    api.on("slidesInView", select);
     return () => {
       api.off("select", select);
+      api.off("slidesInView", select);
     };
   }, [api, select]);
   return (
@@ -63,7 +82,9 @@ export function Dashboard() {
           Все инструменты для осознанной торговли
           <br />в одном пространстве.
         </p>
-        <span className="hero-line" />
+        <Link href="/trading" className="hero-action">
+          Открыть журнал <ArrowRight size={16} aria-hidden="true" />
+        </Link>
         <div className="hero-principles" aria-hidden="true">
           ANALYZE
           <br />
@@ -94,79 +115,96 @@ export function Dashboard() {
           onKeyDown={(e) => {
             if (e.key === "ArrowRight") {
               e.preventDefault();
-              api?.scrollNext();
+              api?.scrollNext(Boolean(reduced));
             }
             if (e.key === "ArrowLeft") {
               e.preventDefault();
-              api?.scrollPrev();
+              api?.scrollPrev(Boolean(reduced));
             }
           }}
         >
           <button
             className="carousel-arrow prev"
             aria-label="Предыдущий раздел"
-            onClick={() => api?.scrollPrev()}
+            onClick={() => api?.scrollPrev(Boolean(reduced))}
           >
             <ChevronLeft size={19} />
           </button>
           <div ref={emblaRef} className="carousel-viewport">
             <div className="carousel-track">
-              {modules.map((m, i) => (
-                <div className="feature-slide" key={m.slug}>
-                  <motion.div
-                    animate={{
-                      opacity: selected === i ? 1 : 0.72,
-                      scale: selected === i ? 1 : 0.91,
-                      rotateY: selected === i ? 0 : i < selected ? -7 : 7,
-                    }}
-                    transition={{ duration: reduced ? 0 : 0.4 }}
-                    className={
-                      "feature-card " + (selected === i ? "selected" : "")
-                    }
-                  >
-                    <Link href={"/" + m.slug}>
-                      <div className="feature-top">
-                        {i === 0 ? (
-                          <BrainCircuit size={20} />
-                        ) : i === 1 ? (
-                          <ChartCandlestick size={18} />
-                        ) : (
-                          <Users size={18} />
-                        )}
-                        <span>0{i + 1}</span>
-                      </div>
-                      <Sculpture kind={m.slug === "ai" ? "ai" : m.art} />
-                      <div className="feature-copy">
-                        <h3>{names[m.slug]}</h3>
-                        <p>{m.text}</p>
-                        <span className="round-arrow">
-                          <ArrowRight size={18} />
-                        </span>
-                      </div>
-                    </Link>
-                  </motion.div>
-                </div>
-              ))}
+              {modules.map((m, i) => {
+                const Icon = featureIcons[m.slug as keyof typeof featureIcons];
+                return (
+                  <div className="feature-slide" key={m.slug}>
+                    <motion.div
+                      animate={{
+                        opacity: 1,
+                        scale: selected === i ? 1 : 0.91,
+                        rotateY: selected === i ? 0 : i < selected ? -7 : 7,
+                      }}
+                      transition={{ duration: reduced ? 0 : 0.4 }}
+                      className={
+                        "feature-card " + (selected === i ? "selected" : "")
+                      }
+                    >
+                      <Link
+                        href={"/" + m.slug}
+                        tabIndex={visibleSlides.includes(i) ? 0 : -1}
+                      >
+                        <div className="feature-top">
+                          <Icon size={20} aria-hidden="true" />
+                          <span>0{i + 1}</span>
+                        </div>
+                        <Sculpture kind={m.slug === "ai" ? "ai" : m.art} />
+                        <div className="feature-copy">
+                          <span className="feature-status">
+                            {m.slug === "copy-trading"
+                              ? "В разработке"
+                              : m.slug === "ai"
+                                ? "Анализ и дисциплина"
+                                : m.slug === "trading"
+                                  ? "Личный инструмент"
+                                  : "Ваше развитие"}
+                          </span>
+                          <h3>{names[m.slug]}</h3>
+                          <p>{m.text}</p>
+                          <span className="round-arrow">
+                            <ArrowRight size={18} />
+                          </span>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <button
             className="carousel-arrow next"
             aria-label="Следующий раздел"
-            onClick={() => api?.scrollNext()}
+            onClick={() => api?.scrollNext(Boolean(reduced))}
           >
             <ChevronRight size={19} />
           </button>
         </div>
-        <div className="dots">
-          {modules.map((m, i) => (
-            <button
-              key={m.slug}
-              className={i === selected ? "current" : ""}
-              aria-label={"Показать " + m.title}
-              aria-current={i === selected ? "true" : undefined}
-              onClick={() => api?.scrollTo(i)}
-            />
-          ))}
+        <div className="carousel-bottom">
+          <p className="carousel-announcement" role="status" aria-live="polite">
+            {String(selected + 1).padStart(2, "0")} <span>/ 07</span>{" "}
+            <span className="current-section">
+              {names[modules[selected].slug]}
+            </span>
+          </p>
+          <div className="dots">
+            {modules.map((m, i) => (
+              <button
+                key={m.slug}
+                className={i === selected ? "current" : ""}
+                aria-label={"Показать " + names[m.slug]}
+                aria-current={i === selected ? "true" : undefined}
+                onClick={() => api?.scrollTo(i, Boolean(reduced))}
+              />
+            ))}
+          </div>
         </div>
       </section>
       <section className="stats" aria-label="Торговые результаты">

@@ -41,7 +41,7 @@ test("carousel keyboard and section search", async ({ page }) => {
   await carousel.focus();
   await carousel.press("ArrowRight");
   await expect(
-    page.getByRole("button", { name: "Показать Community" }),
+    page.getByRole("button", { name: "Показать Сообщество" }),
   ).toHaveAttribute("aria-current", "true");
   await page.getByLabel("Поиск по разделам").fill("Журнал");
   await page
@@ -49,4 +49,28 @@ test("carousel keyboard and section search", async ({ page }) => {
     .getByRole("link", { name: "Журнал" })
     .click();
   await expect(page).toHaveURL(/\/trading$/);
+});
+
+test("search is keyboard operable", async ({ page }) => {
+  await page.goto("/");
+  const search = page.getByLabel("Поиск по разделам");
+  await search.fill("Журнал");
+  await search.press("ArrowDown");
+  await expect(page.locator(".search-results a").first()).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/trading$/);
+});
+test("mobile navigation closes with escape and restores focus", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  const toggle = page.getByRole("button", { name: "Открыть навигацию" });
+  await toggle.click();
+  await expect(
+    page.getByRole("dialog", { name: "Навигация Mansion" }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(toggle).toBeFocused();
 });

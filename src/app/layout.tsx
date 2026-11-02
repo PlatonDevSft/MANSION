@@ -8,6 +8,7 @@ import "@fontsource/cormorant-garamond/cyrillic-400.css";
 import "./globals.css";
 import "./redesign.css";
 import "./ui-polish.css";
+import "./home.css";
 import { Shell } from "@/components/shell";
 export const metadata: Metadata = {
   title: "Mansion — Trading Intelligence",

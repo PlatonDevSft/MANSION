@@ -5,7 +5,6 @@ import useEmblaCarousel from "embla-carousel-react";
 import { motion, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
-  ArrowUpRight,
   ChevronLeft,
   ChevronRight,
   BrainCircuit,
@@ -16,9 +15,7 @@ import {
   FlaskConical,
   Globe,
 } from "lucide-react";
-import { modules as allModules, traders, demoTrades } from "@/lib/demo";
-import { money, statistics } from "@/lib/journal";
-import { useLocal } from "@/lib/use-local";
+import { modules as allModules } from "@/lib/demo";
 export function Sculpture({ kind }: { kind: string }) {
   return <div aria-hidden="true" className={`sculpture render-art ${kind}`} />;
 }
@@ -42,8 +39,6 @@ const featureIcons = {
   economy: Globe,
 };
 export function Dashboard() {
-  const local = useLocal("mansion.trades", demoTrades);
-  const stats = statistics(local.value);
   const [emblaRef, api] = useEmblaCarousel({
     loop: true,
     align: "center",
@@ -71,7 +66,6 @@ export function Dashboard() {
   return (
     <>
       <section className="welcome">
-        <div className="eyebrow">MANSION / TRADING INTELLIGENCE</div>
         <h1>
           Дисциплина
           <br />
@@ -82,19 +76,6 @@ export function Dashboard() {
           Все инструменты для осознанной торговли
           <br />в одном пространстве.
         </p>
-        <Link href="/trading" className="hero-action">
-          Открыть журнал <ArrowRight size={16} aria-hidden="true" />
-        </Link>
-        <div className="hero-principles" aria-hidden="true">
-          ANALYZE
-          <br />
-          IMPROVE
-          <br />
-          DISCIPLINE
-          <br />
-          GROW
-          <span />
-        </div>
       </section>
       <section className="explore">
         <div className="section-title">
@@ -205,59 +186,6 @@ export function Dashboard() {
               />
             ))}
           </div>
-        </div>
-      </section>
-      <section className="stats" aria-label="Торговые результаты">
-        {[
-          ["Последняя закрытая сделка", stats.last, "Реализованный P&L · USD"],
-          ["Результат за месяц", stats.monthly, "Календарный месяц · UTC"],
-          ["Средний результат", stats.average, "Все закрытые сделки · USD"],
-        ].map(([label, value, caption]) => (
-          <div className="stat" key={String(label)}>
-            <div className="stat-label">
-              {String(label)}
-              <ArrowUpRight size={15} />
-            </div>
-            <strong
-              className={value !== null && Number(value) < 0 ? "negative" : ""}
-            >
-              {money(value as Parameters<typeof money>[0])}
-            </strong>
-            <small>{String(caption)}</small>
-          </div>
-        ))}
-      </section>
-      <section className="best">
-        <div className="section-title">
-          <div>
-            <h2>В сильном окружении</h2>
-            <p>Примеры профилей · октябрь 2026 · данные не верифицированы</p>
-          </div>
-          <Link href="/leaderboard" className="text-link">
-            Все трейдеры <ArrowRight size={16} />
-          </Link>
-        </div>
-        <div className="traders">
-          {traders.map((t, i) => (
-            <Link
-              href={"/community?profile=" + i}
-              className="trader"
-              key={t.name}
-            >
-              <span className="avatar trader-avatar">{t.initials}</span>
-              <div>
-                <strong>{t.name}</strong>
-                <small>{t.style}</small>
-              </div>
-              <svg viewBox="0 0 80 35" aria-hidden="true">
-                <path d="M0 30 L10 25 18 28 28 13 38 19 48 12 55 17 65 7 80 3" />
-              </svg>
-              <div className="trader-result">
-                {t.value}
-                <small>Демо · месяц</small>
-              </div>
-            </Link>
-          ))}
         </div>
       </section>
     </>

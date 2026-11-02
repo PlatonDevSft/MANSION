@@ -22,6 +22,8 @@ import {
   X,
   Headphones,
   ChevronDown,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { useLocal } from "@/lib/use-local";
 const links = [
@@ -41,6 +43,8 @@ const links = [
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const [menu, setMenu] = useState(false);
+  const homeRail = useLocal("mansion.home-sidebar-collapsed", false);
+  const home = path === "/";
   const [support, setSupport] = useState(false);
   const [profile, setProfile] = useState(false);
   const [sent, setSent] = useState(false);
@@ -97,7 +101,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
   );
   return (
     <div
-      className={"app " + (path === "/" ? "dashboard-scene" : "inner-scene")}
+      className={
+        "app " +
+        (home
+          ? "dashboard-scene" + (homeRail.value ? " home-compact" : "")
+          : "inner-scene")
+      }
     >
       <a className="skip-link" href="#main-content">
         Перейти к содержимому
@@ -153,14 +162,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
               key={href}
               href={href}
               aria-current={path === href ? "page" : undefined}
+              aria-label={label}
+              title={home && homeRail.value ? label : undefined}
               onClick={() => setMenu(false)}
               className={
                 (path === href ? "active " : "") +
                 (href === "/settings" ? "settings-link" : "")
               }
             >
-              <Icon size={17} />
-              {label}
+              <Icon size={17} aria-hidden="true" />
+              <span className="nav-label">{label}</span>
             </Link>
           ))}
         </nav>
@@ -179,6 +190,26 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </aside>
       <div className="workspace" inert={menu}>
         <header className="topbar">
+          {home && (
+            <button
+              type="button"
+              className="home-sidebar-toggle icon-button"
+              aria-label={
+                homeRail.value
+                  ? "Развернуть боковую панель"
+                  : "Свернуть боковую панель"
+              }
+              aria-expanded={!homeRail.value}
+              aria-controls="primary-navigation"
+              onClick={() => homeRail.setValue(!homeRail.value)}
+            >
+              {homeRail.value ? (
+                <PanelLeftOpen size={20} />
+              ) : (
+                <PanelLeftClose size={20} />
+              )}
+            </button>
+          )}
           <div className="global-search">
             <Search size={17} />
             <input

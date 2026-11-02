@@ -74,3 +74,65 @@ test("mobile navigation closes with escape and restores focus", async ({
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   await expect(toggle).toBeFocused();
 });
+
+test("home contains only hero and carousel", async ({ page }) => {
+  await page.goto("/");
+  await expect(
+    page.getByRole("region", { name: "Разделы Mansion" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Торговые результаты" }),
+  ).toHaveCount(0);
+  await expect(page.getByText("В сильном окружении")).toHaveCount(0);
+  await expect(page.getByText("MANSION / TRADING INTELLIGENCE")).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Открыть журнал", exact: true }),
+  ).toHaveCount(0);
+  await expect(page.locator(".hero-principles")).toHaveCount(0);
+});
+
+test("desktop sidebar collapses to labelled icons and persists", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const sidebar = page.locator("#primary-navigation");
+  const expanded = (await sidebar.boundingBox())!.width;
+  await page.getByRole("button", { name: "Свернуть боковую панель" }).click();
+  await expect(
+    page.getByRole("button", { name: "Развернуть боковую панель" }),
+  ).toHaveAttribute("aria-expanded", "false");
+  await expect(sidebar.locator(".nav-label").first()).toBeHidden();
+  await expect(
+    sidebar.getByRole("link", { name: "Главная", exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Развернуть боковую панель" }),
+  ).toBeVisible();
+  await expect
+    .poll(async () => (await sidebar.boundingBox())!.width)
+    .toBeLessThan(expanded);
+  await page.getByRole("button", { name: "Развернуть боковую панель" }).click();
+  await expect(sidebar.locator(".nav-label").first()).toBeVisible();
+});
+
+for (const [width, height] of [
+  [1080, 1080],
+  [1920, 1080],
+  [2560, 1080],
+  [3440, 1440],
+]) {
+  test(`home scales to ${width}x${height}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto("/");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    const main = await page.locator("main").boundingBox();
+    expect(main!.width).toBeLessThanOrEqual(1800);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  });
+}

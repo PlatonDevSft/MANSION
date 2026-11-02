@@ -92,8 +92,13 @@ export default function Velaris() {
       elapsed = 0;
     const resize = () => {
       const r = el.getBoundingClientRect();
-      el.width = Math.max(1, Math.round(Math.min(r.width, 1200)));
-      el.height = Math.max(1, Math.round(Math.min(r.height, 850)));
+      const scale = Math.min(
+        1,
+        1200 / Math.max(1, r.width),
+        850 / Math.max(1, r.height),
+      );
+      el.width = Math.max(1, Math.round(r.width * scale));
+      el.height = Math.max(1, Math.round(r.height * scale));
       gl.viewport(0, 0, el.width, el.height);
     };
     const draw = (now: number) => {

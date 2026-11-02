@@ -1,37 +1,44 @@
 import { NextResponse } from "next/server";
-import { parseMarkets } from "@/lib/markets";
+import { marketInstruments, parseYahooChart } from "@/lib/markets";
 export const runtime = "nodejs";
 export async function GET() {
-  try {
-    const response = await fetch(
-      "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,binancecoin,ripple&sparkline=true&price_change_percentage=24h",
-      {
-        next: { revalidate: 300 },
-        signal: AbortSignal.timeout(8000),
-        headers: { accept: "application/json" },
-      },
-    );
-    if (!response.ok) throw new Error("Market provider unavailable");
-    const assets = parseMarkets(await response.json());
-    if (assets.length === 0) throw new Error("No valid market data");
-    return NextResponse.json(
-      {
-        source: "CoinGecko",
-        currency: "USD",
-        period: "24h",
-        sparklinePeriod: "approx-24h",
-        assets,
-      },
-      {
-        headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=300",
+  const results = await Promise.allSettled(
+    marketInstruments.map(async (instrument) => {
+      const response = await fetch(
+        `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(instrument.yahoo)}?interval=15m&range=1d`,
+        {
+          next: { revalidate: 300 },
+          signal: AbortSignal.timeout(6000),
+          headers: { accept: "application/json" },
         },
-      },
-    );
-  } catch {
+      );
+      if (!response.ok) throw new Error("Provider unavailable");
+      return parseYahooChart(await response.json(), instrument);
+    }),
+  );
+  const assets = results.flatMap((r) =>
+    r.status === "fulfilled" ? [r.value] : [],
+  );
+  if (assets.length !== marketInstruments.length)
     return NextResponse.json(
-      { error: "Источник котировок временно недоступен. Попробуйте позже." },
+      {
+        error:
+          "Источник мини-графиков временно недоступен. Доступна официальная лента TradingView.",
+      },
       { status: 503, headers: { "Cache-Control": "no-store" } },
     );
-  }
+  return NextResponse.json(
+    {
+      source: "Yahoo Finance",
+      currency: "USD",
+      period: "session",
+      sparklinePeriod: "session",
+      assets,
+    },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=300",
+      },
+    },
+  );
 }

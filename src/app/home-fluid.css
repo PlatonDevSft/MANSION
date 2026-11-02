@@ -1,0 +1,519 @@
+/* Single home layout calibration: viewport-wide composition, uninterrupted background. */
+.dashboard-scene {
+  --home-content: none;
+  --home-sidebar: clamp(190px, 12vw, 340px);
+  --home-gutter: clamp(24px, 2.8vw, 110px);
+  --home-header: clamp(64px, 7svh, 100px);
+  --home-hero: clamp(180px, 28svh, 430px);
+  --home-card: clamp(280px, 42svh, 660px);
+  --rail-top: clamp(24px, 2.7svh, 42px);
+  --rail-pad: clamp(14px, 1.2vw, 30px);
+}
+.dashboard-scene .topbar,
+.dashboard-scene main,
+.dashboard-scene footer {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+.dashboard-scene .workspace {
+  min-height: 100svh;
+  transition: margin-left 280ms cubic-bezier(0.2, 0.6, 0.3, 1);
+}
+.dashboard-scene .workspace:after {
+  content: none;
+}
+.dashboard-scene .workspace:before {
+  inset: 0;
+  height: auto;
+  max-height: none;
+  background-image: url("/images/obsidian-hero.webp");
+  background-size: auto min(105svh, 1500px);
+  background-position: right top;
+  background-repeat: no-repeat;
+  mask-image: linear-gradient(180deg, #000 0%, #000 38%, transparent 94%);
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+.dashboard-scene .home-ambient {
+  inset: 0;
+  min-height: 100%;
+  background: #040808;
+}
+.dashboard-scene .home-ambient canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.dashboard-scene .welcome {
+  min-height: var(--home-hero);
+  padding: clamp(15px, 2svh, 35px) 0 18px;
+}
+.dashboard-scene .welcome h1 {
+  font-size: clamp(34px, min(3.5vw, 6svh), 108px);
+  font-weight: 500;
+  line-height: 1.04;
+  max-width: none;
+  margin-bottom: clamp(12px, 1.3svh, 24px);
+}
+.dashboard-scene .welcome > p {
+  font-size: clamp(12px, min(0.95vw, 1.6svh), 24px);
+  max-width: none;
+}
+.dashboard-scene .topbar {
+  height: var(--home-header);
+  gap: clamp(16px, 1.5vw, 36px);
+}
+.dashboard-scene .topbar .global-search {
+  width: clamp(300px, 34vw, 900px);
+  height: clamp(40px, 4.5svh, 64px);
+}
+.dashboard-scene .global-search input {
+  font-size: clamp(12px, 0.8vw, 21px);
+}
+.dashboard-scene .profile {
+  font-size: clamp(12px, 0.8vw, 21px);
+  gap: clamp(9px, 0.75vw, 22px);
+}
+.dashboard-scene .profile .avatar {
+  width: clamp(30px, 3.5svh, 52px);
+  height: clamp(30px, 3.5svh, 52px);
+  font-size: clamp(12px, 1vw, 20px);
+}
+.dashboard-scene .demo-pill {
+  font-size: clamp(10px, 0.65vw, 16px);
+}
+.dashboard-scene .feature-card {
+  height: var(--home-card);
+  backdrop-filter: blur(2px) saturate(1.12);
+  -webkit-backdrop-filter: blur(2px) saturate(1.12);
+  background: linear-gradient(135deg, #d7edf408, #0a171d16 50%, #07111638);
+}
+.dashboard-scene .feature-card.selected {
+  background: linear-gradient(135deg, #e1f6f80c, #0c1d2216 60%, #101c242b);
+  backdrop-filter: blur(2px) saturate(1.12);
+  -webkit-backdrop-filter: blur(2px) saturate(1.12);
+}
+.dashboard-scene .feature-card > a {
+  padding: clamp(15px, 2svh, 32px);
+  grid-template-rows: clamp(32px, 3.7svh, 54px) minmax(65px, 1fr) auto;
+}
+.dashboard-scene .feature-top {
+  display: flex;
+  align-items: flex-start;
+}
+.dashboard-scene .feature-top > .feature-icon {
+  display: grid;
+  place-items: center;
+  width: clamp(32px, 3.6svh, 54px);
+  height: clamp(32px, 3.6svh, 54px);
+  padding: 0;
+  line-height: 0;
+  flex-shrink: 0;
+}
+.dashboard-scene .feature-top > .feature-icon > svg {
+  display: block;
+  width: 55%;
+  height: 55%;
+  margin: 0;
+  padding: 0;
+  position: static;
+  transform: none;
+  vertical-align: initial;
+  align-self: center;
+  justify-self: center;
+}
+.dashboard-scene .feature-top > span:not(.feature-icon) {
+  font-size: clamp(10px, 0.7vw, 18px);
+}
+.dashboard-scene .render-art.sculpture {
+  width: clamp(130px, min(13vw, 21svh), 340px);
+  max-height: none;
+  height: 100%;
+  min-height: 65px;
+  margin: -4px auto 0;
+}
+.dashboard-scene .feature-copy h3 {
+  font-size: clamp(17px, min(1.45vw, 2.5svh), 38px);
+  margin: 6px 0 10px;
+}
+.dashboard-scene .feature-copy p {
+  font-size: clamp(12px, min(0.95vw, 1.7svh), 25px);
+  max-width: none;
+  line-height: 1.55;
+}
+.dashboard-scene .feature-status {
+  font-size: clamp(9px, min(0.65vw, 1.25svh), 17px);
+  letter-spacing: 0.08em;
+}
+.dashboard-scene .round-arrow {
+  width: clamp(30px, 3.8svh, 54px);
+  height: clamp(30px, 3.8svh, 54px);
+  margin-top: clamp(10px, 1.3svh, 20px);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+.dashboard-scene .round-arrow svg {
+  width: 48%;
+  height: 48%;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+.dashboard-scene .liquid-glass {
+  backdrop-filter: blur(1px) saturate(1.15);
+  -webkit-backdrop-filter: blur(1px) saturate(1.15);
+  background: linear-gradient(140deg, #f0ffff14, #b9eeed03 45%, #e3ffff0a);
+}
+.dashboard-scene .carousel-arrow {
+  width: clamp(40px, 4.5svh, 64px);
+  height: clamp(40px, 4.5svh, 64px);
+}
+.dashboard-scene .carousel-announcement {
+  font-size: clamp(11px, 0.8vw, 20px);
+}
+.dashboard-scene .carousel-bottom {
+  min-height: clamp(32px, 3.8svh, 55px);
+}
+.dashboard-scene .sidebar {
+  padding: var(--rail-top) var(--rail-pad) 24px;
+  transition:
+    width 280ms cubic-bezier(0.2, 0.6, 0.3, 1),
+    padding 280ms cubic-bezier(0.2, 0.6, 0.3, 1);
+}
+.dashboard-scene .sidebar .logo {
+  height: 40px;
+  min-height: 40px;
+  padding: 0 38px 0 0;
+  justify-content: flex-start;
+  margin-top: 0;
+  gap: clamp(10px, 0.8vw, 20px);
+}
+.dashboard-scene .sidebar .brand-name {
+  font-size: clamp(11px, 0.85vw, 22px);
+  letter-spacing: 0.18em;
+}
+.dashboard-scene .sidebar .home-sidebar-toggle {
+  top: var(--rail-top);
+  right: 8px;
+  width: 32px;
+  min-width: 32px;
+  height: 40px;
+  margin: 0;
+  transition: color 180ms ease;
+}
+.dashboard-scene .sidebar nav {
+  margin-top: clamp(24px, 3svh, 50px);
+  gap: clamp(2px, 0.5svh, 9px);
+}
+.dashboard-scene .sidebar nav a {
+  display: grid;
+  grid-template-columns: clamp(30px, 2.5vw, 52px) minmax(0, 1fr);
+  align-items: center;
+  justify-content: initial;
+  gap: 0;
+  padding: clamp(7px, 1svh, 15px) 0;
+  min-height: clamp(34px, 4.3svh, 65px);
+  font-size: clamp(12px, 0.78vw, 22px);
+}
+.dashboard-scene .sidebar nav a > svg {
+  justify-self: center;
+  width: clamp(17px, 1.1vw, 28px);
+  height: clamp(17px, 1.1vw, 28px);
+  margin: 0;
+}
+.dashboard-scene .sidebar nav a.settings-link {
+  padding-top: clamp(12px, 1.5svh, 22px);
+  margin-top: clamp(8px, 1svh, 16px);
+}
+.dashboard-scene .sidebar .member-mark {
+  font-size: clamp(11px, 0.72vw, 20px);
+}
+.dashboard-scene .sidebar .member-mark small,
+.dashboard-scene .sidebar-bottom > a {
+  font-size: clamp(10px, 0.65vw, 17px);
+}
+.dashboard-scene .sidebar-bottom > p {
+  font-size: clamp(9px, 0.6vw, 15px);
+}
+.dashboard-scene.home-compact {
+  --home-sidebar: clamp(72px, 4.4vw, 114px);
+}
+@media (min-width: 601px) {
+  .dashboard-scene.home-compact .sidebar {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .dashboard-scene.home-compact .sidebar .logo {
+    padding-left: 0;
+    padding-right: 32px;
+    margin-top: 0;
+    justify-content: flex-start;
+  }
+  .dashboard-scene.home-compact .sidebar .brand-mark {
+    transform: scale(0.8);
+    transform-origin: left center;
+  }
+  .dashboard-scene.home-compact .sidebar .home-sidebar-toggle {
+    top: var(--rail-top);
+    right: 4px;
+  }
+  .dashboard-scene.home-compact .sidebar nav {
+    margin-top: clamp(24px, 3svh, 50px);
+  }
+  .dashboard-scene.home-compact .sidebar nav a {
+    grid-template-columns: 1fr;
+    justify-content: initial;
+    padding: clamp(7px, 1svh, 15px) 0;
+    min-height: clamp(34px, 4.3svh, 65px);
+  }
+  .dashboard-scene.home-compact .sidebar nav a > svg {
+    width: clamp(17px, 1.1vw, 28px);
+    height: clamp(17px, 1.1vw, 28px);
+  }
+}
+.dashboard-scene .market-strip {
+  margin-top: clamp(12px, 1.8svh, 28px);
+  border-top: 0;
+  padding-top: 12px;
+}
+.dashboard-scene .market-caption {
+  font-size: clamp(11px, 0.7vw, 18px);
+}
+.dashboard-scene .market-asset {
+  padding: clamp(9px, 1.1vw, 25px);
+}
+.dashboard-scene .market-symbol {
+  font-size: clamp(12px, 0.8vw, 22px);
+}
+.dashboard-scene .market-change {
+  font-size: clamp(11px, 0.8vw, 21px);
+}
+.dashboard-scene .market-asset svg[role="img"] {
+  max-width: none;
+  width: clamp(55px, 6vw, 170px);
+  height: clamp(25px, 3.5svh, 50px);
+}
+.dashboard-scene footer {
+  font-size: clamp(10px, 0.65vw, 16px);
+  padding-top: clamp(12px, 1.5svh, 24px);
+}
+@media (max-width: 1100px) and (min-width: 601px) {
+  .dashboard-scene .topbar .global-search {
+    width: auto;
+    min-width: 0;
+    flex: 1;
+  }
+  .dashboard-scene .welcome h1 {
+    font-size: clamp(32px, min(4.2vw, 6svh), 52px);
+  }
+  .dashboard-scene .sidebar {
+    --rail-pad: 14px;
+  }
+}
+@media (max-width: 600px) {
+  .dashboard-scene {
+    --home-sidebar: 0px;
+    --rail-top: 30px;
+  }
+  .dashboard-scene.home-compact {
+    --home-sidebar: 0px;
+  }
+  .dashboard-scene .topbar {
+    height: 70px;
+  }
+  .dashboard-scene .topbar .global-search {
+    width: auto;
+    min-width: 0;
+    flex: 1;
+  }
+  .dashboard-scene .global-search input {
+    font-size: 16px;
+  }
+  .dashboard-scene .welcome {
+    padding: 20px 0 12px;
+    min-height: clamp(190px, 28svh, 260px);
+  }
+  .dashboard-scene .welcome h1 {
+    font-size: clamp(30px, 4.6svh, 42px);
+  }
+  .dashboard-scene .welcome > p {
+    font-size: 12px;
+  }
+  .dashboard-scene .feature-card {
+    height: clamp(280px, 40svh, 360px);
+  }
+  .dashboard-scene .feature-card > a {
+    grid-template-rows: 34px minmax(65px, 1fr) auto;
+    padding: 16px;
+  }
+  .dashboard-scene .render-art.sculpture {
+    width: clamp(130px, 19svh, 175px);
+    max-height: 145px;
+  }
+  .dashboard-scene .feature-copy h3 {
+    font-size: 18px;
+    margin: 4px 0 7px;
+  }
+  .dashboard-scene .feature-copy p {
+    font-size: 12px;
+  }
+  .dashboard-scene .feature-status {
+    font-size: 8px;
+  }
+  .dashboard-scene .carousel-bottom {
+    min-height: 32px;
+  }
+  .dashboard-scene .sidebar.mobile-open {
+    padding: 32px 24px 24px;
+  }
+  .dashboard-scene .sidebar.mobile-open .brand-name {
+    font-size: 14px;
+  }
+  .dashboard-scene .sidebar.mobile-open nav a {
+    display: flex;
+    gap: 14px;
+    font-size: 14px;
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+  .dashboard-scene .sidebar .home-sidebar-toggle {
+    display: none;
+  }
+  .dashboard-scene .workspace:before {
+    background-size: auto 470px;
+    background-position: 60% top;
+    mask-image: linear-gradient(#000, transparent 85%);
+  }
+  .dashboard-scene .market-strip {
+    margin-top: 18px;
+  }
+  .dashboard-scene .market-asset {
+    padding: 10px;
+  }
+  .dashboard-scene .market-symbol {
+    font-size: 12px;
+  }
+  .dashboard-scene .market-change {
+    font-size: 11px;
+  }
+  .dashboard-scene .market-asset svg[role="img"] {
+    width: 40px;
+    height: 28px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-scene .sidebar,
+  .dashboard-scene .workspace {
+    transition: none;
+  }
+}
+.dashboard-scene .market-assets {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.tv-tape {
+  min-height: 90px;
+  margin-top: 8px;
+  max-width: 100%;
+  overflow: hidden;
+}
+.tv-tape .tradingview-widget-container {
+  min-height: 48px;
+  width: 100%;
+}
+.tv-credit {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 10px;
+  color: #8ca8a4;
+  padding-top: 5px;
+}
+.tv-credit a {
+  color: #b1d6cc;
+}
+.tv-tape p {
+  font-size: 12px;
+}
+.dashboard-scene .market-error {
+  font-size: 11px;
+  padding: 8px 0;
+  color: #8da7a4;
+}
+@media (max-width: 1400px) and (min-width: 601px) {
+  .dashboard-scene .market-assets {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .dashboard-scene .market-assets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tv-credit {
+    flex-direction: column;
+    font-size: 10px;
+  }
+}
+@media (min-width: 601px) {
+  .dashboard-scene .sidebar nav a,
+  .dashboard-scene.home-compact .sidebar nav a {
+    position: relative;
+    display: flex;
+    padding-left: clamp(30px, 2.5vw, 52px);
+    overflow: hidden;
+  }
+  .dashboard-scene .sidebar nav a > svg {
+    position: absolute;
+    left: clamp(15px, 1.25vw, 26px);
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: left 280ms cubic-bezier(0.2, 0.6, 0.3, 1);
+  }
+  .dashboard-scene.home-compact .sidebar nav a > svg {
+    left: 50%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-scene .sidebar nav a > svg {
+    transition: none;
+  }
+}
+/* Feather every edge of the art itself, independently of the market strip position. */
+.dashboard-scene .workspace:before {
+  left: auto;
+  right: 0;
+  top: 0;
+  bottom: auto;
+  width: min(100%, 157.5svh, 2250px);
+  height: min(105svh, 1500px);
+  background-size: cover;
+  background-position: right top;
+  mask-image:
+    linear-gradient(90deg, transparent 0%, #000 28%),
+    linear-gradient(180deg, #000 0%, #000 38%, transparent 96%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+@media (max-width: 600px) {
+  .dashboard-scene .workspace:before {
+    width: 100%;
+    height: 470px;
+    background-size: auto 470px;
+    background-position: 60% top;
+  }
+}
+/* Explicit square SVG sizes avoid percentage sizing against intrinsic grid tracks. */
+.dashboard-scene .feature-top > .feature-icon > svg {
+  width: clamp(18px, 2.1svh, 31px);
+  height: clamp(18px, 2.1svh, 31px);
+  min-width: clamp(18px, 2.1svh, 31px);
+  min-height: clamp(18px, 2.1svh, 31px);
+  flex-shrink: 0;
+}
+.dashboard-scene .round-arrow svg {
+  width: clamp(15px, 1.8svh, 26px);
+  height: clamp(15px, 1.8svh, 26px);
+  flex-shrink: 0;
+}

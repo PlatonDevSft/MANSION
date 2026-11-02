@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { RefreshCw, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { TradingViewTape } from "@/components/tradingview-tape";
+import { marketInstruments } from "@/lib/markets";
 import { type MarketAsset, sparkline } from "@/lib/markets";
 export function MarketStrip() {
   const [assets, setAssets] = useState<MarketAsset[]>([]),
@@ -34,18 +36,32 @@ export function MarketStrip() {
       clearInterval(timer);
     };
   }, [load]);
+  const fallback = Boolean(error && !assets.length);
   const oldest = assets.length
     ? new Date(Math.min(...assets.map((a) => Date.parse(a.updatedAt))))
     : null;
   return (
-    <section className="market-strip" aria-label="Рынок за 24 часа">
+    <section
+      className="market-strip"
+      aria-label="Рынок: Forex и основные активы"
+    >
       <div className="market-caption">
         <span>
-          Рынок <span className="market-period">24ч</span>
+          Рынок <span className="market-period">Forex · индексы · крипто</span>
         </span>
         <div>
-          <a href="https://www.coingecko.com/" target="_blank" rel="noreferrer">
-            CoinGecko · USD
+          <a
+            href={
+              fallback
+                ? "https://www.tradingview.com/markets/"
+                : "https://finance.yahoo.com/markets/"
+            }
+            target="_blank"
+            rel="noreferrer"
+          >
+            {fallback
+              ? "Лента TradingView"
+              : "Последняя сессия · Yahoo Finance"}
           </a>
           {oldest && (
             <time dateTime={oldest.toISOString()} title={oldest.toISOString()}>
@@ -70,8 +86,9 @@ export function MarketStrip() {
       </div>
       {error && (
         <div className="market-error" role="status">
-          {error}
-          {assets.length > 0 ? " · показаны последние загруженные данные" : ""}
+          {assets.length > 0
+            ? "Мини-графики временно недоступны · показаны последние загруженные данные"
+            : "Мини-графики недоступны · ниже доступна лента TradingView"}
           <button onClick={() => void load()} disabled={loading}>
             Повторить
           </button>
@@ -82,29 +99,38 @@ export function MarketStrip() {
           Загрузка рыночных данных…
         </div>
       )}
+      {error && assets.length === 0 && <TradingViewTape />}
       {assets.length > 0 && (
         <div className="market-assets">
           {assets.map((a) => (
             <a
               className={`market-asset ${a.change < 0 ? "market-down" : "market-up"}`}
               key={a.id}
-              href={`https://www.coingecko.com/en/coins/${a.id}`}
+              href={`https://finance.yahoo.com/quote/${encodeURIComponent(marketInstruments.find((i) => i.id === a.id)?.yahoo ?? a.symbol)}/`}
               target="_blank"
               rel="noreferrer"
-              aria-label={`${a.name}: ${a.change >= 0 ? "+" : ""}${a.change.toFixed(2)}% за 24 часа`}
+              aria-label={`${a.name}: ${a.change >= 0 ? "+" : ""}${a.change.toFixed(2)}% к предыдущему закрытию`}
             >
               <span className="market-symbol">
                 {a.symbol}
-                <small>/ USD</small>
+                <small>
+                  {a.id === "eurusd" || a.id === "gbpusd"
+                    ? "Forex"
+                    : a.id === "gold"
+                      ? "Фьючерс GC"
+                      : a.id === "nasdaq" || a.id === "sp500"
+                        ? "Индекс"
+                        : "/ USD"}
+                </small>
               </span>
               <svg
                 viewBox="0 0 100 30"
                 role="img"
-                aria-label="Динамика примерно за 24 часа"
+                aria-label="Динамика последней торговой сессии"
               >
                 <title>
-                  Последние 25 часовых точек; изменение за 24 часа предоставлено
-                  CoinGecko
+                  Цены последней доступной сессии; изменение к предыдущему
+                  закрытию. Источник: Yahoo Finance.
                 </title>
                 <polyline
                   points={sparkline(a.points)}

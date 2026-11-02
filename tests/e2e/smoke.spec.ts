@@ -132,7 +132,8 @@ for (const [width, height] of [
       ),
     ).toBe(true);
     const main = await page.locator("main").boundingBox();
-    expect(main!.width).toBeLessThanOrEqual(1800);
+    const rail = await page.locator(".sidebar").boundingBox();
+    expect(main!.width).toBeGreaterThan((width - rail!.width) * 0.95);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 }
@@ -188,13 +189,13 @@ test("market strip displays source percentages and charts, without current price
   );
   await page.goto("/");
   await expect(
-    page.getByRole("region", { name: "Рынок за 24 часа" }),
+    page.getByRole("region", { name: "Рынок: Forex и основные активы" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "Bitcoin: -1.25% за 24 часа" }),
+    page.getByRole("link", { name: "Bitcoin: -1.25% к предыдущему закрытию" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("img", { name: "Динамика примерно за 24 часа" }),
+    page.getByRole("img", { name: "Динамика последней торговой сессии" }),
   ).toBeVisible();
 });
 
@@ -204,7 +205,7 @@ test("market provider failure has an honest retry state", async ({ page }) => {
   );
   await page.goto("/");
   await expect(
-    page.getByText("Котировки временно недоступны", { exact: false }),
+    page.getByText("Мини-графики недоступны", { exact: false }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Повторить", exact: true }),
@@ -216,4 +217,79 @@ test("reduced motion keeps a static ambient fallback", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".home-ambient canvas")).toBeHidden();
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+});
+
+test("ultrawide increases actual element sizes and uses available width", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto("/");
+  const font = await page
+    .locator(".welcome h1")
+    .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+  const card = (await page.locator(".feature-card.selected").boundingBox())!
+    .width;
+  await page.setViewportSize({ width: 3440, height: 1440 });
+  await expect
+    .poll(() =>
+      page
+        .locator(".welcome h1")
+        .evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+    )
+    .toBeGreaterThan(font * 1.2);
+  expect(
+    (await page.locator(".feature-card.selected").boundingBox())!.width,
+  ).toBeGreaterThan(card * 1.5);
+});
+test("rail arrow stays level and card icons are optically centered", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto("/");
+  const button = page.locator(".home-sidebar-toggle");
+  const top = (await button.boundingBox())!.y;
+  await button.click();
+  for (let i = 0; i < 8; i++) {
+    await page.waitForTimeout(45);
+    expect(Math.abs((await button.boundingBox())!.y - top)).toBeLessThan(1);
+  }
+  const badges = page.locator(".feature-icon");
+  for (let i = 0; i < 3; i++) {
+    const badge = await badges.nth(i).boundingBox(),
+      icon = await badges.nth(i).locator("svg").boundingBox();
+    expect(
+      Math.abs(badge!.y + badge!.height / 2 - icon!.y - icon!.height / 2),
+    ).toBeLessThan(1.5);
+    expect(
+      Math.abs(badge!.x + badge!.width / 2 - icon!.x - icon!.width / 2),
+    ).toBeLessThan(1.5);
+    expect(
+      Math.abs(icon!.width / badge!.width - icon!.height / badge!.height),
+    ).toBeLessThan(0.1);
+    expect(icon!.width / badge!.width).toBeGreaterThan(0.35);
+  }
+});
+test("market fallback config includes all requested instruments", async ({
+  page,
+}) => {
+  await page.route("**/api/markets", (route) =>
+    route.fulfill({ status: 503, json: { error: "unavailable" } }),
+  );
+  await page.route("https://s3.tradingview.com/**", (route) =>
+    route.fulfill({ contentType: "application/javascript", body: "" }),
+  );
+  await page.goto("/");
+  await expect(page.locator(".tv-tape")).toBeVisible();
+  const config = JSON.parse(
+    (await page.locator(".tv-tape script").textContent()) ?? "{}",
+  );
+  expect(config.symbols.map((s: { proName: string }) => s.proName)).toEqual([
+    "FX:EURUSD",
+    "FX:GBPUSD",
+    "OANDA:XAUUSD",
+    "NASDAQ:NDX",
+    "SP:SPX",
+    "BITSTAMP:BTCUSD",
+    "BITSTAMP:ETHUSD",
+  ]);
 });

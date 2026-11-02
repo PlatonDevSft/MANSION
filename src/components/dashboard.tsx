@@ -1,53 +1,50 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  BrainCircuit,
   ChartCandlestick,
   Users,
   BookOpen,
   Copy,
-  FlaskConical,
   Globe,
 } from "lucide-react";
+import { GlowCard, useSpotlightGroup } from "@/components/ui/spotlight-card";
 import { LiquidGlass } from "@/components/ui/liquid-glass";
 import { MarketStrip } from "@/components/market-strip";
 import { modules as allModules } from "@/lib/demo";
 export function Sculpture({ kind }: { kind: string }) {
   return <div aria-hidden="true" className={`sculpture render-art ${kind}`} />;
 }
-const modules = [3, 1, 2, 5, 0, 4, 6].map((i) => allModules[i]);
+const modules = [2, 6, 1, 0, 5].map((i) => allModules[i]);
 const names: Record<string, string> = {
-  ai: "AI Ассистент",
   trading: "Журнал сделок",
   community: "Сообщество",
   "copy-trading": "Копи-трейдинг",
   knowledge: "База знаний",
-  strategies: "Strategy Lab",
   economy: "Экономика",
 };
 const featureIcons = {
-  ai: BrainCircuit,
   trading: ChartCandlestick,
   community: Users,
   knowledge: BookOpen,
   "copy-trading": Copy,
-  strategies: FlaskConical,
   economy: Globe,
 };
 export function Dashboard() {
+  const glowGroup = useRef<HTMLDivElement>(null);
+  useSpotlightGroup(glowGroup);
   const [emblaRef, api] = useEmblaCarousel({
     loop: true,
     align: "center",
-    startIndex: 1,
+    startIndex: 2,
   });
-  const [selected, setSelected] = useState(1);
-  const [visibleSlides, setVisibleSlides] = useState<number[]>([0, 1, 2]);
+  const [selected, setSelected] = useState(2);
+  const [visibleSlides, setVisibleSlides] = useState<number[]>([1, 2, 3]);
   const reduced = useReducedMotion();
   const select = useCallback(() => {
     if (api) {
@@ -87,11 +84,12 @@ export function Dashboard() {
           </div>
           <span className="counter">
             0{selected + 1}
-            <span> / 07</span>
+            <span> / {String(modules.length).padStart(2, "0")}</span>
           </span>
         </div>
         <div
           className="carousel"
+          ref={glowGroup}
           role="region"
           aria-roledescription="карусель"
           aria-label="Разделы Mansion"
@@ -120,13 +118,21 @@ export function Dashboard() {
                 const Icon = featureIcons[m.slug as keyof typeof featureIcons];
                 return (
                   <div className="feature-slide" key={m.slug}>
-                    <motion.div
+                    <GlowCard
                       animate={{
                         opacity: 1,
                         scale: selected === i ? 1 : 0.91,
                         rotateY: selected === i ? 0 : i < selected ? -7 : 7,
                       }}
-                      transition={{ duration: reduced ? 0 : 0.4 }}
+                      whileHover={
+                        reduced
+                          ? undefined
+                          : { scale: selected === i ? 1.025 : 0.95 }
+                      }
+                      transition={{
+                        duration: reduced ? 0 : 0.3,
+                        ease: [0.22, 0.61, 0.36, 1],
+                      }}
                       className={
                         "feature-card " + (selected === i ? "selected" : "")
                       }
@@ -141,16 +147,14 @@ export function Dashboard() {
                           </LiquidGlass>
                           <span>0{i + 1}</span>
                         </div>
-                        <Sculpture kind={m.slug === "ai" ? "ai" : m.art} />
+                        <Sculpture kind={m.art} />
                         <div className="feature-copy">
                           <span className="feature-status">
                             {m.slug === "copy-trading"
                               ? "В разработке"
-                              : m.slug === "ai"
-                                ? "Анализ и дисциплина"
-                                : m.slug === "trading"
-                                  ? "Личный инструмент"
-                                  : "Ваше развитие"}
+                              : m.slug === "trading"
+                                ? "Личный инструмент"
+                                : "Ваше развитие"}
                           </span>
                           <h3>{names[m.slug]}</h3>
                           <p>{m.text}</p>
@@ -159,7 +163,7 @@ export function Dashboard() {
                           </LiquidGlass>
                         </div>
                       </Link>
-                    </motion.div>
+                    </GlowCard>
                   </div>
                 );
               })}
@@ -175,7 +179,8 @@ export function Dashboard() {
         </div>
         <div className="carousel-bottom">
           <p className="carousel-announcement" role="status" aria-live="polite">
-            {String(selected + 1).padStart(2, "0")} <span>/ 07</span>{" "}
+            {String(selected + 1).padStart(2, "0")}{" "}
+            <span>/ {String(modules.length).padStart(2, "0")}</span>{" "}
             <span className="current-section">
               {names[modules[selected].slug]}
             </span>

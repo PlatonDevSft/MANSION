@@ -41,7 +41,7 @@ test("carousel keyboard and section search", async ({ page }) => {
   await carousel.focus();
   await carousel.press("ArrowRight");
   await expect(
-    page.getByRole("button", { name: "Показать Сообщество" }),
+    page.getByRole("button", { name: "Показать База знаний" }),
   ).toHaveAttribute("aria-current", "true");
   await page.getByLabel("Поиск по разделам").fill("Журнал");
   await page
@@ -292,4 +292,57 @@ test("market fallback config includes all requested instruments", async ({
     "BITSTAMP:BTCUSD",
     "BITSTAMP:ETHUSD",
   ]);
+});
+
+test("home carousel has five ordered sections with trading centered", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto("/");
+  await expect(page.locator(".feature-card h3")).toHaveText([
+    "Сообщество",
+    "Экономика",
+    "Журнал сделок",
+    "База знаний",
+    "Копи-трейдинг",
+  ]);
+  await expect(page.locator(".feature-card.selected h3")).toHaveText(
+    "Журнал сделок",
+  );
+  await expect(page.locator(".dots button")).toHaveCount(5);
+  await expect(
+    page.getByRole("button", { name: "Показать Журнал сделок" }),
+  ).toHaveAttribute("aria-current", "true");
+  const viewport = await page.locator(".carousel-viewport").boundingBox();
+  for (const slug of ["economy", "trading", "knowledge"]) {
+    const r = await page
+      .locator(`.feature-card a[href="/${slug}"]`)
+      .boundingBox();
+    expect(r!.x).toBeGreaterThanOrEqual(viewport!.x - 2);
+    expect(r!.x + r!.width).toBeLessThanOrEqual(
+      viewport!.x + viewport!.width + 2,
+    );
+  }
+  await expect(page.locator(".carousel-announcement")).toContainText("/ 05");
+});
+test("hover gently zooms a card and illuminates its edge", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const card = page.locator(".feature-card.selected");
+  const box = await card.boundingBox();
+  await card.hover();
+  await expect
+    .poll(async () => (await card.boundingBox())!.width)
+    .toBeGreaterThan(box!.width * 1.01);
+  await expect
+    .poll(() =>
+      card.evaluate((el) => Number(el.style.getPropertyValue("--spot-power"))),
+    )
+    .toBeGreaterThan(0.9);
+  await page.mouse.move(5, 5);
+  await expect
+    .poll(() =>
+      card.evaluate((el) => Number(el.style.getPropertyValue("--spot-power"))),
+    )
+    .toBe(0);
 });

@@ -517,3 +517,59 @@
   height: clamp(15px, 1.8svh, 26px);
   flex-shrink: 0;
 }
+
+/* Proximity border illumination, using the existing glass surfaces and card sizes. */
+.dashboard-scene .feature-card[data-glow] {
+  --spot-x: 50%;
+  --spot-y: 50%;
+  --spot-power: 0;
+}
+.spotlight-wash,
+.spotlight-border {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: var(--spot-power, 0);
+  transition: opacity 220ms ease;
+}
+.spotlight-wash {
+  z-index: 0;
+  background: radial-gradient(
+    350px circle at var(--spot-x) var(--spot-y),
+    #99e7dc0e,
+    transparent 75%
+  );
+}
+.spotlight-border {
+  z-index: 3;
+  padding: 1px;
+  background: radial-gradient(
+    280px circle at var(--spot-x) var(--spot-y),
+    #e6fffb 0%,
+    #88d6c5 22%,
+    #92bed377 48%,
+    transparent 76%
+  );
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+}
+.dashboard-scene .feature-card > a {
+  z-index: 1;
+}
+.dashboard-scene .feature-card:focus-within .spotlight-border {
+  opacity: 1;
+  background: linear-gradient(135deg, #a0dfce, #9bbcca55);
+}
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-border,
+  .spotlight-wash {
+    transition: none;
+  }
+  .spotlight-wash {
+    display: none;
+  }
+}

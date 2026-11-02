@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 
 const vertex = `attribute vec2 position;void main(){gl_Position=vec4(position,0.,1.);}`;
 const fragment = `precision mediump float;
-uniform vec2 resolution;uniform float time;
+uniform vec2 resolution;uniform float time;uniform float aspect;
 vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
 vec2 mod289(vec2 x){return x-floor(x*(1./289.))*289.;}
 vec3 permute(vec3 x){return mod289(((x*34.)+1.)*x);}
@@ -17,7 +17,7 @@ float snoise(vec2 v){
  m*=1.79284291400159-.85373472095314*(a0*a0+h*h);
  vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;return 130.*dot(m,g);
 }
-void main(){vec2 uv=gl_FragCoord.xy/resolution;vec2 p=uv*vec2(resolution.x/resolution.y,1.);
+void main(){vec2 uv=gl_FragCoord.xy/resolution;vec2 p=uv*vec2(aspect,1.);
  float t=time*.028;float n=snoise(p*1.3+vec2(t,-t*.6));
  float clouds=smoothstep(-.5,.85,snoise(p*1.8+vec2(n*.5,t*.5)));
  float vignette=1.-smoothstep(.25,1.,distance(uv,vec2(.66,.56)));
@@ -35,11 +35,15 @@ export default function Velaris() {
     if (!el) return;
     const motion = matchMedia("(prefers-reduced-motion: reduce)");
     const gl = el.getContext("webgl", {
-      alpha: false,
+      alpha: true,
       antialias: false,
       powerPreference: "low-power",
     });
     if (!gl) return;
+    // Allocate once. Resizing a WebGL drawing buffer clears it; CSS resizing must never do that.
+    el.width = Math.min(1200, Math.max(480, Math.round(window.innerWidth)));
+    el.height = 800;
+    gl.viewport(0, 0, el.width, el.height);
     const compile = (type: number, source: string) => {
       const s = gl.createShader(type);
       if (!s) return null;
@@ -85,21 +89,24 @@ export default function Velaris() {
     gl.enableVertexAttribArray(pos);
     gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
     const res = gl.getUniformLocation(program, "resolution"),
-      time = gl.getUniformLocation(program, "time");
+      time = gl.getUniformLocation(program, "time"),
+      aspect = gl.getUniformLocation(program, "aspect");
     let frame = 0,
       last = 0,
       visible = true,
       elapsed = 0;
+    let aspectValue = 1;
+    const paint = () => {
+      gl.uniform2f(res, el.width, el.height);
+      gl.uniform1f(time, elapsed);
+      gl.uniform1f(aspect, aspectValue);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    };
     const resize = () => {
       const r = el.getBoundingClientRect();
-      const scale = Math.min(
-        1,
-        1200 / Math.max(1, r.width),
-        850 / Math.max(1, r.height),
-      );
-      el.width = Math.max(1, Math.round(r.width * scale));
-      el.height = Math.max(1, Math.round(r.height * scale));
-      gl.viewport(0, 0, el.width, el.height);
+      aspectValue = r.width / Math.max(1, r.height);
+      // Only update projection and redraw synchronously; keep the last gradient visible throughout.
+      if (!motion.matches && visible && !document.hidden) paint();
     };
     const draw = (now: number) => {
       if (
@@ -110,19 +117,18 @@ export default function Velaris() {
       ) {
         elapsed += Math.min(now - last, 60) / 1000;
         last = now;
-        gl.uniform2f(res, el.width, el.height);
-        gl.uniform1f(time, elapsed);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        paint();
       }
       frame = requestAnimationFrame(draw);
     };
     const update = () => {
-      el.style.opacity = motion.matches ? "0" : "1";
       cancelAnimationFrame(frame);
       if (!motion.matches) {
+        paint();
+        el.style.opacity = "1";
         last = performance.now();
         frame = requestAnimationFrame(draw);
-      }
+      } else el.style.opacity = "0";
     };
     const observer = new ResizeObserver(resize);
     observer.observe(el);

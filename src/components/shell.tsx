@@ -25,6 +25,7 @@ import {
   ArrowLeftToLine,
   ArrowRightFromLine,
 } from "lucide-react";
+import { HomeUserProfile } from "@/components/home-user-profile";
 import Velaris from "@/components/ui/velaris";
 import { useLocal } from "@/lib/use-local";
 const links = [
@@ -46,6 +47,22 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const [menu, setMenu] = useState(false);
   const homeRail = useLocal("mansion.home-sidebar-collapsed", false);
   const home = path === "/";
+  const [railAnimating, setRailAnimating] = useState(false);
+  const railTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toggleRail = () => {
+    setRailAnimating(true);
+    homeRail.setValue(!homeRail.value);
+    if (railTimer.current) clearTimeout(railTimer.current);
+    railTimer.current = setTimeout(() => setRailAnimating(false), 320);
+  };
+  useEffect(() => {
+    const resize = () => setRailAnimating(false);
+    window.addEventListener("resize", resize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", resize);
+      if (railTimer.current) clearTimeout(railTimer.current);
+    };
+  }, []);
   const [support, setSupport] = useState(false);
   const [profile, setProfile] = useState(false);
   const [sent, setSent] = useState(false);
@@ -67,7 +84,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       if (e.key !== "Tab") return;
       const elements = Array.from(
         navigation.current?.querySelectorAll<HTMLElement>("a,button") ?? [],
-      );
+      ).filter((el) => el.getClientRects().length > 0);
       const first = elements[0],
         last = elements.at(-1);
       if (e.shiftKey && document.activeElement === first) {
@@ -87,6 +104,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   }, [menu]);
 
   useEffect(() => {
+    if (home) return;
     const shortcut = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
@@ -95,13 +113,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
     };
     window.addEventListener("keydown", shortcut);
     return () => window.removeEventListener("keydown", shortcut);
-  }, []);
+  }, [home]);
   const requests = useLocal<{ id: string; message: string; status: string }[]>(
     "mansion.requests",
     [],
   );
   return (
     <div
+      data-rail-animating={home && railAnimating ? "true" : "false"}
       className={
         "app " +
         (home
@@ -135,7 +154,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         id="primary-navigation"
         role={menu ? "dialog" : undefined}
         aria-modal={menu ? true : undefined}
-        aria-label="Навигация Mansion"
+        aria-label={home ? "Навигация VANTAGE" : "Навигация Mansion"}
         className={menu ? "sidebar mobile-open" : "sidebar"}
       >
         {menu && (
@@ -155,7 +174,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <i />
             <i />
           </span>
-          <span className="brand-name">MANSION</span>
+          <span className="brand-name">{home ? "VANTAGE" : "MANSION"}</span>
         </Link>
         {home && (
           <button
@@ -168,7 +187,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             }
             aria-expanded={!homeRail.value}
             aria-controls="primary-navigation"
-            onClick={() => homeRail.setValue(!homeRail.value)}
+            onClick={toggleRail}
           >
             {homeRail.value ? (
               <ArrowRightFromLine size={18} />
@@ -200,106 +219,122 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="member-mark">
             <Crown size={18} />
             <div>
-              Mansion Member<small>Демонстрационный доступ</small>
+              {home ? "Membership" : "Mansion Member"}
+              <small>Демонстрационный доступ</small>
             </div>
           </div>
-          <Link href="/subscription">
-            Открыть больше возможностей <ArrowUpRight size={14} />
-          </Link>
-          <p>Осознанность. Дисциплина. Рост.</p>
+          {home ? (
+            <HomeUserProfile onNavigate={() => setMenu(false)} />
+          ) : (
+            <>
+              <Link href="/subscription">
+                Открыть больше возможностей <ArrowUpRight size={14} />
+              </Link>
+              <p>Осознанность. Дисциплина. Рост.</p>
+            </>
+          )}
         </div>
       </aside>
       <div className="workspace" inert={menu}>
         {home && <Velaris />}
-        <header className="topbar">
-          <div className="global-search">
-            <Search size={17} />
-            <input
-              ref={searchInput}
-              aria-label="Поиск по разделам"
-              placeholder="Поиск по разделам Mansion…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") setSearch("");
-                if (e.key === "ArrowDown" && search.trim()) {
-                  e.preventDefault();
-                  document
-                    .querySelector<HTMLAnchorElement>(".search-results a")
-                    ?.focus();
-                }
-              }}
-            />
-            <kbd>⌘ K</kbd>
-            {search.trim() && (
-              <div
-                className="search-results"
+        {!home && (
+          <header className="topbar">
+            <div className="global-search">
+              <Search size={17} />
+              <input
+                ref={searchInput}
+                aria-label="Поиск по разделам"
+                placeholder="Поиск по разделам Mansion…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Escape") {
-                    setSearch("");
-                    searchInput.current?.focus();
-                  }
-                  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                  if (e.key === "Escape") setSearch("");
+                  if (e.key === "ArrowDown" && search.trim()) {
                     e.preventDefault();
-                    const items = Array.from(
-                      e.currentTarget.querySelectorAll<HTMLAnchorElement>("a"),
-                    );
-                    const current = items.indexOf(
-                      document.activeElement as HTMLAnchorElement,
-                    );
-                    items[
-                      (current +
-                        (e.key === "ArrowDown" ? 1 : -1) +
-                        items.length) %
-                        items.length
-                    ]?.focus();
+                    document
+                      .querySelector<HTMLAnchorElement>(".search-results a")
+                      ?.focus();
                   }
                 }}
-              >
-                {links
-                  .filter(([, label]) =>
+              />
+              <kbd>⌘ K</kbd>
+              {search.trim() && (
+                <div
+                  className="search-results"
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      setSearch("");
+                      searchInput.current?.focus();
+                    }
+                    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                      e.preventDefault();
+                      const items = Array.from(
+                        e.currentTarget.querySelectorAll<HTMLAnchorElement>(
+                          "a",
+                        ),
+                      );
+                      const current = items.indexOf(
+                        document.activeElement as HTMLAnchorElement,
+                      );
+                      items[
+                        (current +
+                          (e.key === "ArrowDown" ? 1 : -1) +
+                          items.length) %
+                          items.length
+                      ]?.focus();
+                    }
+                  }}
+                >
+                  {links
+                    .filter(([, label]) =>
+                      label.toLowerCase().includes(search.toLowerCase()),
+                    )
+                    .map(([href, label, Icon]) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setSearch("")}
+                      >
+                        <Icon size={16} />
+                        {label}
+                      </Link>
+                    ))}
+                  {!links.some(([, label]) =>
                     label.toLowerCase().includes(search.toLowerCase()),
-                  )
-                  .map(([href, label, Icon]) => (
-                    <Link key={href} href={href} onClick={() => setSearch("")}>
-                      <Icon size={16} />
-                      {label}
-                    </Link>
-                  ))}
-                {!links.some(([, label]) =>
-                  label.toLowerCase().includes(search.toLowerCase()),
-                ) && <p>Раздел не найден. Попробуйте «Журнал».</p>}
-              </div>
-            )}
-          </div>
-          <div className="profile-wrap">
-            <span className="demo-pill">DEMO · локальные данные</span>
-            <button
-              className="profile"
-              onClick={() => setProfile(!profile)}
-              aria-expanded={profile}
-            >
-              <span className="avatar">М</span>
-              <span>Исследователь</span>
-              <ChevronDown size={14} />
-            </button>
-            {profile && (
-              <div className="profile-menu">
-                <Link href="/settings" onClick={() => setProfile(false)}>
-                  Мой профиль
-                </Link>
-                <Link href="/login" onClick={() => setProfile(false)}>
-                  Войти в аккаунт
-                </Link>
-              </div>
-            )}
-          </div>
-        </header>
+                  ) && <p>Раздел не найден. Попробуйте «Журнал».</p>}
+                </div>
+              )}
+            </div>
+            <div className="profile-wrap">
+              <span className="demo-pill">DEMO · локальные данные</span>
+              <button
+                className="profile"
+                onClick={() => setProfile(!profile)}
+                aria-expanded={profile}
+              >
+                <span className="avatar">М</span>
+                <span>Исследователь</span>
+                <ChevronDown size={14} />
+              </button>
+              {profile && (
+                <div className="profile-menu">
+                  <Link href="/settings" onClick={() => setProfile(false)}>
+                    Мой профиль
+                  </Link>
+                  <Link href="/login" onClick={() => setProfile(false)}>
+                    Войти в аккаунт
+                  </Link>
+                </div>
+              )}
+            </div>
+          </header>
+        )}
         <main id="main-content" tabIndex={-1}>
           {children}
         </main>
         <footer>
-          MANSION <span>Пространство осознанной торговли</span>
+          {home ? "VANTAGE" : "MANSION"}{" "}
+          <span>Пространство осознанной торговли</span>
           <span>Демо · не инвестиционная рекомендация</span>
         </footer>
       </div>

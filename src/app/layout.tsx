@@ -11,6 +11,7 @@ import "./ui-polish.css";
 import "./home.css";
 import "./home-effects.css";
 import "./home-fluid.css";
+import "./home-stability.css";
 import { Shell } from "@/components/shell";
 export const metadata: Metadata = {
   title: "Mansion — Trading Intelligence",

@@ -1,0 +1,140 @@
+/* Window resizing is immediate fluid layout; animation is reserved for intentional rail toggles. */
+.dashboard-scene .sidebar,
+.dashboard-scene .workspace,
+.dashboard-scene .sidebar nav a > svg {
+  transition: none;
+}
+.dashboard-scene[data-rail-animating="true"] .sidebar {
+  transition:
+    width 280ms cubic-bezier(0.2, 0.6, 0.3, 1),
+    padding 280ms cubic-bezier(0.2, 0.6, 0.3, 1);
+}
+.dashboard-scene[data-rail-animating="true"] .workspace {
+  transition: margin-left 280ms cubic-bezier(0.2, 0.6, 0.3, 1);
+}
+.dashboard-scene[data-rail-animating="true"] .sidebar nav a > svg {
+  transition: left 280ms cubic-bezier(0.2, 0.6, 0.3, 1);
+}
+.dashboard-scene main {
+  padding-top: clamp(24px, 3svh, 46px);
+}
+.dashboard-scene .sidebar-bottom {
+  padding-top: 20px;
+}
+.home-user-profile {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #bdddda17;
+}
+.home-user-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 8px 4px;
+  min-height: 52px;
+  border-radius: 8px;
+  color: #d5e4de;
+}
+.home-user-trigger:hover,
+.home-user-trigger[aria-expanded="true"] {
+  background: #c7e9e008;
+}
+.home-user-trigger .avatar {
+  width: clamp(32px, 3.4svh, 48px);
+  height: clamp(32px, 3.4svh, 48px);
+  flex-shrink: 0;
+  background: radial-gradient(circle at 40% 20%, #819787, #22362c 65%, #0a1510);
+  color: #dae2d6;
+  font-family: Georgia, serif;
+  font-size: clamp(12px, 1vw, 20px);
+}
+.home-user-copy {
+  display: block;
+  min-width: 0;
+  flex: 1;
+}
+.home-user-copy strong {
+  font-size: clamp(11px, 0.75vw, 20px);
+  font-weight: 500;
+  display: block;
+  white-space: nowrap;
+}
+.home-user-copy small {
+  font-size: clamp(10px, 0.62vw, 15px);
+  color: #8fa8a0;
+  margin-top: 3px;
+}
+.home-user-chevron {
+  flex-shrink: 0;
+  color: #99b5aa;
+}
+.home-user-popover {
+  position: fixed;
+  inset: auto;
+  left: 16px;
+  bottom: 90px;
+  margin: 0;
+  width: 240px;
+  max-width: calc(100vw - 24px);
+  padding: 8px;
+  background: #101c1ef5;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid #9dc4c43b;
+  border-radius: 10px;
+  box-shadow: 0 14px 50px #0009;
+  color: #dce9e3;
+}
+.home-user-popover a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+.home-user-popover a:hover {
+  background: #bde2d00b;
+}
+.home-user-popover::backdrop {
+  background: none;
+}
+@media (min-width: 601px) {
+  .dashboard-scene.home-compact .home-user-copy,
+  .dashboard-scene.home-compact .home-user-chevron {
+    display: none;
+  }
+  .dashboard-scene.home-compact .home-user-trigger {
+    justify-content: center;
+    gap: 0;
+    padding: 6px 0;
+  }
+}
+@media (max-width: 600px) {
+  .dashboard-scene main {
+    padding-top: 70px;
+  }
+  .home-user-trigger .avatar {
+    width: 34px;
+    height: 34px;
+  }
+  .home-user-copy strong {
+    font-size: 13px;
+  }
+  .home-user-copy small {
+    font-size: 11px;
+  }
+  .dashboard-scene .sidebar.mobile-open .home-user-copy,
+  .dashboard-scene .sidebar.mobile-open .home-user-chevron {
+    display: block;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-scene[data-rail-animating="true"] .sidebar,
+  .dashboard-scene[data-rail-animating="true"] .workspace,
+  .dashboard-scene[data-rail-animating="true"] .sidebar nav a > svg {
+    transition: none;
+  }
+}

@@ -43,6 +43,7 @@ test("carousel keyboard and section search", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "Показать База знаний" }),
   ).toHaveAttribute("aria-current", "true");
+  await page.goto("/knowledge");
   await page.getByLabel("Поиск по разделам").fill("Журнал");
   await page
     .locator(".search-results")
@@ -51,8 +52,8 @@ test("carousel keyboard and section search", async ({ page }) => {
   await expect(page).toHaveURL(/\/trading$/);
 });
 
-test("search is keyboard operable", async ({ page }) => {
-  await page.goto("/");
+test("other-page search is keyboard operable", async ({ page }) => {
+  await page.goto("/knowledge");
   const search = page.getByLabel("Поиск по разделам");
   await search.fill("Журнал");
   await search.press("ArrowDown");
@@ -68,7 +69,7 @@ test("mobile navigation closes with escape and restores focus", async ({
   const toggle = page.getByRole("button", { name: "Открыть навигацию" });
   await toggle.click();
   await expect(
-    page.getByRole("dialog", { name: "Навигация Mansion" }),
+    page.getByRole("dialog", { name: "Навигация VANTAGE" }),
   ).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
@@ -345,4 +346,84 @@ test("hover gently zooms a card and illuminates its edge", async ({ page }) => {
       card.evaluate((el) => Number(el.style.getPropertyValue("--spot-power"))),
     )
     .toBe(0);
+});
+
+test("home user menu lives under membership and VANTAGE replaces the home brand", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator(".sidebar .brand-name")).toHaveText("VANTAGE");
+  await expect(page.locator(".topbar")).toHaveCount(0);
+  await expect(page.getByLabel("Поиск по разделам")).toHaveCount(0);
+  await expect(page.locator(".demo-pill")).toHaveCount(0);
+  await expect(page.getByText("Открыть больше возможностей")).toHaveCount(0);
+  await expect(
+    page.getByText("Осознанность. Дисциплина. Рост.", { exact: true }),
+  ).toHaveCount(0);
+  const member = await page.locator(".member-mark").boundingBox(),
+    user = await page.locator(".home-user-trigger").boundingBox();
+  expect(user!.y).toBeGreaterThan(member!.y + member!.height);
+  const trigger = page.getByRole("button", {
+    name: "Открыть меню пользователя",
+  });
+  await trigger.click();
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await expect(
+    page.getByRole("link", { name: "Мой профиль", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Войти в аккаунт", exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await page.getByRole("button", { name: "Свернуть боковую панель" }).click();
+  await trigger.click();
+  await expect(
+    page.getByRole("link", { name: "Мой профиль", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Мой профиль", exact: true }).click();
+  await expect(page).toHaveURL(/\/settings$/);
+});
+
+test("resizing preserves the WebGL buffer instead of clearing the gradient", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto("/");
+  const canvas = page.locator(".home-ambient canvas");
+  await expect(canvas).toHaveCSS("opacity", "1");
+  const initial = await canvas.evaluate((el) => ({
+    width: (el as HTMLCanvasElement).width,
+    height: (el as HTMLCanvasElement).height,
+  }));
+  await canvas.evaluate((el) => {
+    el.dataset.bufferChanges = "0";
+    new MutationObserver((entries) => {
+      el.dataset.bufferChanges = String(
+        Number(el.dataset.bufferChanges) + entries.length,
+      );
+    }).observe(el, { attributes: true, attributeFilter: ["width", "height"] });
+  });
+  for (const [width, height] of [
+    [1800, 1000],
+    [1366, 768],
+    [2500, 1200],
+    [3440, 1440],
+    [1280, 720],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await expect(canvas).toHaveCSS("opacity", "1");
+    expect(
+      await canvas.evaluate((el) => ({
+        width: (el as HTMLCanvasElement).width,
+        height: (el as HTMLCanvasElement).height,
+      })),
+    ).toEqual(initial);
+    await expect(page.locator(".workspace")).toHaveCSS(
+      "transition-duration",
+      "0s",
+    );
+  }
+  expect(await canvas.getAttribute("data-buffer-changes")).toBe("0");
 });

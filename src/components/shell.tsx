@@ -22,9 +22,10 @@ import {
   X,
   Headphones,
   ChevronDown,
-  PanelLeftClose,
-  PanelLeftOpen,
+  ArrowLeftToLine,
+  ArrowRightFromLine,
 } from "lucide-react";
+import Velaris from "@/components/ui/velaris";
 import { useLocal } from "@/lib/use-local";
 const links = [
   ["/", "Главная", House],
@@ -156,6 +157,26 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </span>
           <span className="brand-name">MANSION</span>
         </Link>
+        {home && (
+          <button
+            type="button"
+            className="home-sidebar-toggle icon-button"
+            aria-label={
+              homeRail.value
+                ? "Развернуть боковую панель"
+                : "Свернуть боковую панель"
+            }
+            aria-expanded={!homeRail.value}
+            aria-controls="primary-navigation"
+            onClick={() => homeRail.setValue(!homeRail.value)}
+          >
+            {homeRail.value ? (
+              <ArrowRightFromLine size={18} />
+            ) : (
+              <ArrowLeftToLine size={18} />
+            )}
+          </button>
+        )}
         <nav aria-label="Главная навигация">
           {links.map(([href, label, Icon]) => (
             <Link
@@ -189,27 +210,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
       <div className="workspace" inert={menu}>
+        {home && <Velaris />}
         <header className="topbar">
-          {home && (
-            <button
-              type="button"
-              className="home-sidebar-toggle icon-button"
-              aria-label={
-                homeRail.value
-                  ? "Развернуть боковую панель"
-                  : "Свернуть боковую панель"
-              }
-              aria-expanded={!homeRail.value}
-              aria-controls="primary-navigation"
-              onClick={() => homeRail.setValue(!homeRail.value)}
-            >
-              {homeRail.value ? (
-                <PanelLeftOpen size={20} />
-              ) : (
-                <PanelLeftClose size={20} />
-              )}
-            </button>
-          )}
           <div className="global-search">
             <Search size={17} />
             <input

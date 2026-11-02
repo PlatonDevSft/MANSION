@@ -6,7 +6,7 @@
 - Never mix currencies or apply the linear P&L formula to unsupported instruments. Money inputs are decimal strings; calculations use Decimal.js; PostgreSQL uses numeric.
 - Supabase client credentials must be anon/publishable only. Authorize server actions with getUser(); keep RLS on all tables. No service-role key in browser code.
 - Keep private notes/trades separate from public posts. Do not expose trade screenshots publicly.
-- Hero and feature illustrations are generated 3D artwork, optimized as WebP in public/images. Preserve their proportions; no WebGL is necessary.
+- Hero and feature illustrations are generated 3D artwork, optimized as WebP in public/images. Preserve their proportions. Only the optional home ambient field uses WebGL, with a static CSS/reduced-motion fallback.
 - Run lint, typecheck, unit tests, build and relevant browser tests. Record external checks that remain unverified.
 - AI/news/calendar/billing are extension points, not working integrations. Never fake success.
 

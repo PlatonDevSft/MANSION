@@ -15,6 +15,8 @@ import {
   FlaskConical,
   Globe,
 } from "lucide-react";
+import { LiquidGlass } from "@/components/ui/liquid-glass";
+import { MarketStrip } from "@/components/market-strip";
 import { modules as allModules } from "@/lib/demo";
 export function Sculpture({ kind }: { kind: string }) {
   return <div aria-hidden="true" className={`sculpture render-art ${kind}`} />;
@@ -67,9 +69,10 @@ export function Dashboard() {
     <>
       <section className="welcome">
         <h1>
-          Дисциплина
+          <span className="headline-line">Дисциплина</span>
           <br />
-          сегодня —<br />
+          <span className="headline-line">сегодня —</span>
+          <br />
           <em>результат завтра</em>
         </h1>
         <p>
@@ -133,7 +136,9 @@ export function Dashboard() {
                         tabIndex={visibleSlides.includes(i) ? 0 : -1}
                       >
                         <div className="feature-top">
-                          <Icon size={20} aria-hidden="true" />
+                          <LiquidGlass className="feature-icon">
+                            <Icon size={20} aria-hidden="true" />
+                          </LiquidGlass>
                           <span>0{i + 1}</span>
                         </div>
                         <Sculpture kind={m.slug === "ai" ? "ai" : m.art} />
@@ -149,9 +154,9 @@ export function Dashboard() {
                           </span>
                           <h3>{names[m.slug]}</h3>
                           <p>{m.text}</p>
-                          <span className="round-arrow">
-                            <ArrowRight size={18} />
-                          </span>
+                          <LiquidGlass className="round-arrow">
+                            <ArrowRight size={18} aria-hidden="true" />
+                          </LiquidGlass>
                         </div>
                       </Link>
                     </motion.div>
@@ -188,6 +193,7 @@ export function Dashboard() {
           </div>
         </div>
       </section>
+      <MarketStrip />
     </>
   );
 }

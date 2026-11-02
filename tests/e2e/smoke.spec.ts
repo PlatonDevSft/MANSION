@@ -136,3 +136,84 @@ for (const [width, height] of [
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 }
+
+for (const [width, height] of [
+  [1920, 1080],
+  [1920, 900],
+  [1366, 768],
+  [1280, 720],
+  [375, 812],
+  [375, 667],
+  [390, 844],
+  [800, 600],
+]) {
+  test(`hero and full carousel fit ${width}x${height}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto("/");
+    const carousel = await page.locator(".explore").boundingBox();
+    expect(carousel!.y + carousel!.height).toBeLessThanOrEqual(height - 8);
+    if (width > 600)
+      await page
+        .getByRole("button", { name: "Свернуть боковую панель" })
+        .click();
+    await expect
+      .poll(async () => {
+        const box = await page.locator(".explore").boundingBox();
+        return box!.y + box!.height;
+      })
+      .toBeLessThanOrEqual(height - 8);
+    if (width > 600)
+      await expect(page.locator(".sidebar .home-sidebar-toggle")).toBeVisible();
+  });
+}
+
+test("market strip displays source percentages and charts, without current prices", async ({
+  page,
+}) => {
+  await page.route("**/api/markets", (route) =>
+    route.fulfill({
+      json: {
+        assets: [
+          {
+            id: "bitcoin",
+            name: "Bitcoin",
+            symbol: "BTC",
+            change: -1.25,
+            points: [100, 99, 101, 98],
+            updatedAt: "2026-11-02T10:00:00.000Z",
+          },
+        ],
+      },
+    }),
+  );
+  await page.goto("/");
+  await expect(
+    page.getByRole("region", { name: "Рынок за 24 часа" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Bitcoin: -1.25% за 24 часа" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("img", { name: "Динамика примерно за 24 часа" }),
+  ).toBeVisible();
+});
+
+test("market provider failure has an honest retry state", async ({ page }) => {
+  await page.route("**/api/markets", (route) =>
+    route.fulfill({ status: 503, json: { error: "unavailable" } }),
+  );
+  await page.goto("/");
+  await expect(
+    page.getByText("Котировки временно недоступны", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Повторить", exact: true }),
+  ).toBeVisible();
+});
+
+test("reduced motion keeps a static ambient fallback", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(page.locator(".home-ambient canvas")).toBeHidden();
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+});

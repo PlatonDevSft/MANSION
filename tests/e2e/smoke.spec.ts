@@ -103,7 +103,7 @@ test("desktop sidebar collapses to labelled icons and persists", async ({
   await expect(
     page.getByRole("button", { name: "Развернуть боковую панель" }),
   ).toHaveAttribute("aria-expanded", "false");
-  await expect(sidebar.locator(".nav-label").first()).toBeHidden();
+  await expect(sidebar.locator(".nav-label").first()).toHaveCSS("opacity", "0");
   await expect(
     sidebar.getByRole("link", { name: "Главная", exact: true }),
   ).toBeVisible();
@@ -426,4 +426,38 @@ test("resizing preserves the WebGL buffer instead of clearing the gradient", asy
     );
   }
   expect(await canvas.getAttribute("data-buffer-changes")).toBe("0");
+});
+
+test("home rail keeps icon positions throughout collapse and excludes secondary sections", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto("/");
+  const nav = page.locator(".sidebar nav");
+  for (const name of ["Сообщество", "Копи-трейдинг", "Рейтинг"]) {
+    await expect(nav.getByRole("link", { name, exact: true })).toHaveCount(0);
+  }
+  const icons = nav.locator("a > svg");
+  const positions = await icons.evaluateAll((els) =>
+    els.map((el) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y };
+    }),
+  );
+  for (const name of ["Свернуть боковую панель", "Развернуть боковую панель"]) {
+    await page.getByRole("button", { name, exact: true }).click();
+    for (let frame = 0; frame < 8; frame++) {
+      await page.waitForTimeout(45);
+      const current = await icons.evaluateAll((els) =>
+        els.map((el) => {
+          const r = el.getBoundingClientRect();
+          return { x: r.x, y: r.y };
+        }),
+      );
+      current.forEach((r, i) => {
+        expect(Math.abs(r.x - positions[i].x)).toBeLessThan(1);
+        expect(Math.abs(r.y - positions[i].y)).toBeLessThan(1);
+      });
+    }
+  }
 });

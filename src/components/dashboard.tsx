@@ -143,19 +143,19 @@ export function Dashboard() {
                         scale: reduced
                           ? selected === i
                             ? 1
-                            : 0.91
-                          : 1 - Math.min(Math.abs(offsets[i]), 2) * 0.09,
+                            : 0.95
+                          : 1 - Math.min(Math.abs(offsets[i]), 2) * 0.05,
                         rotateY: reduced
                           ? 0
-                          : Math.max(-1, Math.min(1, offsets[i])) * -18,
+                          : Math.max(-1, Math.min(1, offsets[i])) * -10,
                         z: reduced
                           ? 0
-                          : -Math.min(Math.abs(offsets[i]), 2) * 55,
+                          : -Math.min(Math.abs(offsets[i]), 2) * 20,
                       }}
                       whileHover={
                         reduced
                           ? undefined
-                          : { scale: selected === i ? 1.025 : 0.95 }
+                          : { scale: selected === i ? 1.025 : 0.975 }
                       }
                       transition={{
                         duration: reduced ? 0 : 0.22,

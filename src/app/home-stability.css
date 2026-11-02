@@ -160,9 +160,7 @@
 /* Reveal more of the stone above the cards without changing its scale. */
 @media (min-width: 601px) {
   .dashboard-scene .workspace::before {
-    background-position:
-      calc(100% + clamp(24px, 3vw, 100px))
-      calc(-1 * clamp(30px, 6svh, 90px));
+    background-position: calc(100% + clamp(36px, 4vw, 130px)) 0px;
   }
   .dashboard-scene .welcome {
     margin-bottom: clamp(8px, 1svh, 14px);
@@ -171,5 +169,103 @@
 @media (min-width: 601px) and (min-height: 850px) {
   .dashboard-scene .welcome {
     margin-bottom: clamp(24px, 3svh, 44px);
+  }
+}
+
+/* Each card has its own vanishing point, keeping both neighbours symmetric. */
+.dashboard-scene .carousel,
+.dashboard-scene .carousel-track {
+  perspective: none;
+}
+.dashboard-scene .carousel-arrow {
+  top: 50%;
+  transform: translateY(-50%);
+}
+@media (min-width: 601px) {
+  /* Keep row geometry intact: only label opacity changes during collapse. */
+  .dashboard-scene .sidebar,
+  .dashboard-scene.home-compact .sidebar {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .dashboard-scene .sidebar .logo,
+  .dashboard-scene.home-compact .sidebar .logo {
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .dashboard-scene .sidebar .brand-mark,
+  .dashboard-scene.home-compact .sidebar .brand-mark {
+    flex-shrink: 0;
+    transform: none;
+  }
+  .dashboard-scene .sidebar nav {
+    flex-shrink: 0;
+  }
+  .dashboard-scene .sidebar nav a,
+  .dashboard-scene.home-compact .sidebar nav a {
+    height: clamp(34px, 4.3svh, 65px);
+    min-height: clamp(34px, 4.3svh, 65px);
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 48px;
+  }
+  .dashboard-scene .sidebar nav a > svg,
+  .dashboard-scene.home-compact .sidebar nav a > svg {
+    left: 24px;
+    transition: none;
+  }
+  .dashboard-scene .brand-name,
+  .dashboard-scene.home-compact .brand-name,
+  .dashboard-scene .nav-label,
+  .dashboard-scene.home-compact .nav-label {
+    display: block;
+    opacity: 1;
+    transition: opacity 180ms ease;
+  }
+  .dashboard-scene.home-compact .brand-name,
+  .dashboard-scene.home-compact .nav-label {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .dashboard-scene .sidebar .member-mark,
+  .dashboard-scene.home-compact .sidebar .member-mark {
+    height: 94px;
+    flex-shrink: 0;
+    justify-content: flex-start;
+    padding: 12px 8px;
+    overflow: hidden;
+  }
+  .dashboard-scene .member-mark > svg {
+    flex-shrink: 0;
+  }
+  .dashboard-scene .sidebar .member-mark > div,
+  .dashboard-scene.home-compact .sidebar .member-mark > div {
+    display: block;
+    min-width: 135px;
+    transition: opacity 180ms ease;
+  }
+  .dashboard-scene.home-compact .sidebar .member-mark > div {
+    opacity: 0;
+  }
+  .dashboard-scene .home-user-copy,
+  .dashboard-scene.home-compact .home-user-copy {
+    display: block;
+    min-width: 135px;
+    transition: opacity 180ms ease;
+  }
+  .dashboard-scene.home-compact .home-user-copy {
+    opacity: 0;
+  }
+  .dashboard-scene .home-user-trigger,
+  .dashboard-scene.home-compact .home-user-trigger {
+    justify-content: flex-start;
+    padding: 8px 4px;
+    gap: 12px;
+    overflow: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-scene .sidebar * {
+    transition: none !important;
   }
 }

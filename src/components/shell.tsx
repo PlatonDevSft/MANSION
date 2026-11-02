@@ -197,23 +197,29 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </button>
         )}
         <nav aria-label="Главная навигация">
-          {links.map(([href, label, Icon]) => (
-            <Link
-              key={href}
-              href={href}
-              aria-current={path === href ? "page" : undefined}
-              aria-label={label}
-              title={home && homeRail.value ? label : undefined}
-              onClick={() => setMenu(false)}
-              className={
-                (path === href ? "active " : "") +
-                (href === "/settings" ? "settings-link" : "")
-              }
-            >
-              <Icon size={17} aria-hidden="true" />
-              <span className="nav-label">{label}</span>
-            </Link>
-          ))}
+          {links
+            .filter(
+              ([href]) =>
+                !home ||
+                !["/community", "/copy-trading", "/leaderboard"].includes(href),
+            )
+            .map(([href, label, Icon]) => (
+              <Link
+                key={href}
+                href={href}
+                aria-current={path === href ? "page" : undefined}
+                aria-label={label}
+                title={home && homeRail.value ? label : undefined}
+                onClick={() => setMenu(false)}
+                className={
+                  (path === href ? "active " : "") +
+                  (href === "/settings" ? "settings-link" : "")
+                }
+              >
+                <Icon size={17} aria-hidden="true" />
+                <span className="nav-label">{label}</span>
+              </Link>
+            ))}
         </nav>
         <div className="sidebar-bottom">
           <div className="member-mark">
